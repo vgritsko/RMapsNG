@@ -20,7 +20,7 @@ import java.util.Set;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.view.ActionMode;
+import androidx.appcompat.view.ActionMode;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;

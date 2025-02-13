@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 34
     //buildToolsVersion "34.0.0"
     namespace "com.sm.maps"
 
     defaultConfig {
         applicationId "com.sm.maps"
         minSdkVersion 29
-        targetSdkVersion 30
+        targetSdkVersion 33
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_17
             targetCompatibility JavaVersion.VERSION_17

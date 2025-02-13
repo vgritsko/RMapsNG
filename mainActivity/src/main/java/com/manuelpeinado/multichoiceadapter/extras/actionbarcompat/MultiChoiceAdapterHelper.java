@@ -15,8 +15,8 @@
  */
 package com.manuelpeinado.multichoiceadapter.extras.actionbarcompat;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import android.widget.BaseAdapter;
 
 import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapterHelperBase;
@@ -30,14 +30,14 @@ public class MultiChoiceAdapterHelper extends MultiChoiceAdapterHelperBase {
 
     @Override
     protected void startActionMode() {
-        if (!(adapterView.getContext() instanceof ActionBarActivity)) {
-            throw new IllegalStateException("List view must belong to an ActionBarActivity");
+        if (!(adapterView.getContext() instanceof AppCompatActivity)) {
+            throw new IllegalStateException("List view must belong to an AppCompatActivity");
         }
         if (!(owner instanceof ActionMode.Callback)) {
             throw new IllegalStateException("Owner adapter must implement ActionMode.Callback");
         }
-        ActionBarActivity activity = (ActionBarActivity) adapterView.getContext();
-        actionMode = activity.startSupportActionMode((ActionMode.Callback)owner);
+        AppCompatActivity activity = (AppCompatActivity) adapterView.getContext();
+        actionMode = activity.startSupportActionMode((ActionMode.Callback) owner);
     }
 
     @Override
@@ -49,7 +49,9 @@ public class MultiChoiceAdapterHelper extends MultiChoiceAdapterHelperBase {
 
     @Override
     protected void setActionModeTitle(String title) {
-        actionMode.setTitle(title);
+        if (actionMode != null) {
+            actionMode.setTitle(title);
+        }
     }
 
     @Override

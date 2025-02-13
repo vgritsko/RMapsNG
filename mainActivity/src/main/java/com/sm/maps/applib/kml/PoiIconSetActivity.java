@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.AdapterView.OnItemClickListener;
 import com.sm.maps.applib.kml.constants.PoiConstants;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.sm.maps.applib.R;
 

@@ -3,7 +3,7 @@ package com.sm.maps.applib.mapselector;
 import android.os.Bundle;
 import android.widget.ScrollView;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.sm.maps.applib.R;
 

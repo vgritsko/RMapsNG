@@ -38,7 +38,7 @@
         <activity
             android:name="com.sm.maps.applib.MainActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop" android:immersive="false">
+            android:launchMode="singleTop" android:immersive="false" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -99,7 +99,8 @@
         <service
             android:name="com.sm.maps.applib.trackwriter.TrackWriterService"
             android:icon="@drawable/track_writer_service"
-            android:process=":trackwriter" >
+            android:process=":trackwriter"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.sm.maps.trackwriter" />
                 <action android:name="com.sm.maps.applib.trackwriter.IRemoteService" />
@@ -116,7 +117,8 @@
         <service
             android:name="com.sm.maps.applib.downloader.MapDownloaderService"
             android:icon="@drawable/track_writer_service"
-            android:process=":mapdownloader" >
+            android:process=":mapdownloader"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.sm.maps.mapdownloader" />
                 <action android:name="com.sm.maps.applib.downloader.IRemoteService" />

@@ -16,7 +16,7 @@
 package com.commonsware.cwac.loaderex.acl;
 
 import android.os.AsyncTask;
-import android.support.v4.content.Loader;
+import androidx.loader.content.Loader;
 
 public abstract class ContentChangingTask extends
     AsyncTask<Object, Void, Void> {

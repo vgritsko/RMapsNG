@@ -30,7 +30,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.kml.XMLparser.GpxPoiParser;

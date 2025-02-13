@@ -26,6 +26,7 @@ import org.andnav.osm.views.util.constants.OpenStreetMapViewConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,6 +37,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
@@ -57,7 +59,7 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.provider.SearchRecentSuggestions;
-import android.support.v4.view.ViewConfigurationCompat;
+import androidx.core.view.ViewConfigurationCompat;
 import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -78,7 +80,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.sm.maps.applib.R;
@@ -163,6 +168,8 @@ public class MainActivity extends AppCompatActivity {
 	private ImageView mOverlayView;
 	private ImageView mMainMenu = null;
 	private ExecutorService mThreadPool = Executors.newSingleThreadExecutor(new SimpleThreadFactory("MainActivity.Search"));
+
+	private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +181,13 @@ public class MainActivity extends AppCompatActivity {
 
 //        mTracker = GoogleAnalyticsTracker.getInstance();
 //        mTracker.startNewSession("UA-10715419-3", 20, this);
+
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+				!= PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+					LOCATION_PERMISSION_REQUEST_CODE);
+		}
 
 		mHasMenuButton = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(this));
 
@@ -290,6 +304,18 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 			queryIntent.setAction("");
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+			} else {
+				Toast.makeText(this, "Разрешение на доступ к локации отклонено", Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 

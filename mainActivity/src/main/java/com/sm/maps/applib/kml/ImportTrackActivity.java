@@ -25,8 +25,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
 
-import android.support.v7.app.AppCompatActivity;
 
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.kml.XMLparser.GpxTrackParser;

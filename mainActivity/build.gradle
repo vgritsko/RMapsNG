@@ -1,18 +1,20 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 34
     //buildToolsVersion "27.0.1"
     namespace "com.sm.maps.applib"
 
     defaultConfig {
         minSdkVersion 29
-        targetSdkVersion 30
+        targetSdkVersion 33
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+
+
 
     buildFeatures {
         aidl true
@@ -35,6 +37,7 @@ android {
 
 dependencies {
     //implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
     implementation 'com.android.support:appcompat-v7:22.2.1'
     implementation files('libs/libGoogleAnalytics.jar')
 }

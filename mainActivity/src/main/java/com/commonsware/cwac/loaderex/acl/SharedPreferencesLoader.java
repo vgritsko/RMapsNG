@@ -17,7 +17,7 @@
 
 package com.commonsware.cwac.loaderex.acl;
 
-import android.support.v4.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
