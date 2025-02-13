@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
 		if(!OpenStreetMapViewConstants.DEBUGMODE)
         	CrashReportHandler.attach(this);
 
-        mTracker = GoogleAnalyticsTracker.getInstance();
-        mTracker.startNewSession("UA-10715419-3", 20, this);
+//        mTracker = GoogleAnalyticsTracker.getInstance();
+//        mTracker.startNewSession("UA-10715419-3", 20, this);
 
 		mHasMenuButton = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(this));
 
@@ -235,12 +235,12 @@ public class MainActivity extends AppCompatActivity {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 			
-			mTracker.setCustomVar(1, "Build", Ut.getAppVersion(this), 1);
-			mTracker.setCustomVar(2, "Ver", Ut.getPackVersion(this), 1);
-			mTracker.setCustomVar(3, "DisplaySize", ""+Math.min(metrics.widthPixels, metrics.heightPixels)+"x"+Math.max(metrics.widthPixels, metrics.heightPixels), 1);
-			mTracker.setCustomVar(4, "DisplayDensity", ""+(int)(160*metrics.density), 1);
-			mTracker.setCustomVar(5, "APILevel", Build.VERSION.SDK, 1);
-			mTracker.trackPageView("/InstallApp");
+//			mTracker.setCustomVar(1, "Build", Ut.getAppVersion(this), 1);
+//			mTracker.setCustomVar(2, "Ver", Ut.getPackVersion(this), 1);
+//			mTracker.setCustomVar(3, "DisplaySize", ""+Math.min(metrics.widthPixels, metrics.heightPixels)+"x"+Math.max(metrics.widthPixels, metrics.heightPixels), 1);
+//			mTracker.setCustomVar(4, "DisplayDensity", ""+(int)(160*metrics.density), 1);
+//			mTracker.setCustomVar(5, "APILevel", Build.VERSION.SDK, 1);
+//			mTracker.trackPageView("/InstallApp");
 			
 			showDialog(R.id.whatsnew);
 		}
@@ -851,7 +851,7 @@ public class MainActivity extends AppCompatActivity {
 			mTileSource.Free();
 		mTileSource = null;
 		mMap.setMoveListener(null);
-		mTracker.stopSession();
+//		mTracker.stopSession();
 		mThreadPool.shutdown();
 		
 		super.onDestroy();
@@ -1033,11 +1033,11 @@ public class MainActivity extends AppCompatActivity {
 			final String mapid = (String)item.getTitleCondensed();
 			setTileSource(mapid, "", true);
 			
-			if(mTileSource.MAP_TYPE == TileSource.PREDEF_ONLINE) {
-				mTracker.setCustomVar(1, "MAP", mapid);
-				mTracker.trackPageView("/maps");
-			}
-			
+//			if(mTileSource.MAP_TYPE == TileSource.PREDEF_ONLINE) {
+//				mTracker.setCustomVar(1, "MAP", mapid);
+//				mTracker.trackPageView("/maps");
+//			}
+//
 			FillOverlays();
 
 	        setTitle();
@@ -1240,10 +1240,10 @@ public class MainActivity extends AppCompatActivity {
 			final String overlayid = (String)item.getTitleCondensed();
 			setTileSource(mTileSource.ID, overlayid, true);
 			
-			if(mTileSource.MAP_TYPE == TileSource.PREDEF_ONLINE) {
-				mTracker.setCustomVar(1, "OVERLAY", overlayid);
-				mTracker.trackPageView("/overlays");
-			}
+//			if(mTileSource.MAP_TYPE == TileSource.PREDEF_ONLINE) {
+//				mTracker.setCustomVar(1, "OVERLAY", overlayid);
+//				mTracker.trackPageView("/overlays");
+//			}
 			
 			FillOverlays();
 	        setTitle();
@@ -1410,7 +1410,7 @@ public class MainActivity extends AppCompatActivity {
 				.setMessage(R.string.ya_dialog_message)
 				.setPositiveButton(R.string.ya_dialog_button_caption, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
-							Browser.saveBookmark(MainActivity.this, "��������� ������", "m.yandex.ru");
+							//Browser.saveBookmark(MainActivity.this, "��������� ������", "m.yandex.ru");
 						}
 				}).create();
 		} else if (id == R.id.whatsnew) {

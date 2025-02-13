@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="whats_new_dialog_text">
+    <string name="whats_new_dialog_text" translatable="false">
 <b>Do you like RMaps?\n
 Buy RMaps.Donation on Google Play Store</b>\n
 \n

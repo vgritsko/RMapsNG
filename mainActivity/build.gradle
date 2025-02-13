@@ -1,12 +1,27 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "27.0.1"
+    compileSdkVersion 30
+    //buildToolsVersion "27.0.1"
+    namespace "com.sm.maps.applib"
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 22
+        minSdkVersion 29
+        targetSdkVersion 30
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        aidl true
+    }
+
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/aidl']
+        }
     }
 
     buildTypes {
@@ -15,9 +30,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile files('libs/libGoogleAnalytics.jar')
+    //implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.android.support:appcompat-v7:22.2.1'
+    implementation files('libs/libGoogleAnalytics.jar')
 }

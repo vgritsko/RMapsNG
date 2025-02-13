@@ -197,7 +197,7 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 		mContentIntent = PendingIntent.getActivity(this, 0,
 				new Intent(this, TrackListActivity.class), 0);
 
-		mNotification.setLatestEventInfo(this, getText(R.string.remote_service_started), text, mContentIntent);
+//		mNotification.setLatestEventInfo(this, getText(R.string.remote_service_started), text, mContentIntent);
 
 		startForegroundCompat(R.string.remote_service_started, mNotification);
 	}
@@ -245,7 +245,7 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 						+" | " + mDf.formatDistance(mTrackStat.Distance)
 						+" | " + mDf.formatSpeed(mTrackStat.AvgSpeed)
 						;
-				mNotification.setLatestEventInfo(TrackWriterService.this, getText(R.string.remote_service_started), text, mContentIntent);
+				//mNotification.setLatestEventInfo(TrackWriterService.this, getText(R.string.remote_service_started), text, mContentIntent);
 				mNM.notify(R.string.remote_service_started, mNotification);
 			}
 		}

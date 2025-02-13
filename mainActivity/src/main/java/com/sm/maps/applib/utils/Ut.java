@@ -541,30 +541,30 @@ public class Ut implements OpenStreetMapConstants, OpenStreetMapViewConstants, P
 
     public static void appendLog(final String fileName, final String text)
     {       
-       final File logFile = new File(fileName);
-       if (!logFile.exists())
-       {
-          try
-          {
-             logFile.createNewFile();
-          } 
-          catch (IOException e)
-          {
-             e.printStackTrace();
-          }
-       }
-       try
-       {
-          //BufferedWriter for performance, true to set append to file flag
-          BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true)); 
-          buf.append(text);
-          buf.newLine();
-          buf.close();
-       }
-       catch (IOException e)
-       {
-          e.printStackTrace();
-       }
+//       final File logFile = new File(fileName);
+//       if (!logFile.exists())
+//       {
+//          try
+//          {
+//             logFile.createNewFile();
+//          }
+//          catch (IOException e)
+//          {
+//             e.printStackTrace();
+//          }
+//       }
+//       try
+//       {
+//          //BufferedWriter for performance, true to set append to file flag
+//          BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+//          buf.append(text);
+//          buf.newLine();
+//          buf.close();
+//       }
+//       catch (IOException e)
+//       {
+//          e.printStackTrace();
+//       }
     }
 
 }

@@ -101,7 +101,8 @@ All rights reserved\n
 \n
 Questions, sentences mail to sm@venus.ru\n
 \n
-How to and FAQ you can find on http://robertdeveloper.blogspot.com/\n</string>
+How to and FAQ you can find on http://robertdeveloper.blogspot.com/\n
+</string>
     <string name="about_dialog_whats_new">What\'s new&#8230;</string>
     <string name="about_dialog_close">Close</string>
     <string name="search_label">Address:</string>
@@ -160,12 +161,12 @@ How to and FAQ you can find on http://robertdeveloper.blogspot.com/\n</string>
     <string name="error_send">Generate report</string>
     <string name="pref_onlinecache">Online maps cache</string>
     <string name="pref_onlinecache_summary">Store online maps tiles to sdcard</string>
-    <string name="pref_memcache">Tile cache in RAM</string>
-    <string name="pref_memcache_summary">RAM cache size in counts of tiles on screen</string>
-    <string name="pref_prevz_cached">Tiles from prev zoom's (cache, offline)</string>
-    <string name="pref_prevz_cached_summary">If cache (or offline map) doesn't contain tile for current zoom, attempt to get and rescale tile from N previous zoom's</string>
-    <string name="pref_prevz_inet">Tiles from prev zoom's (online)</string>
-    <string name="pref_prevz_inet_summary">If online map source doesn't contain tile for current zoom, attempt to get and rescale tile from N previous zoom's</string>
+    <string name="pref_memcache" translatable="false">Tile cache in RAM</string>
+    <string name="pref_memcache_summary" translatable="false">RAM cache size in counts of tiles on screen</string>
+    <string name="pref_prevz_cached" translatable="false">Tiles from prev zoom\'s (cache, offline)</string>
+    <string name="pref_prevz_cached_summary" translatable="false">If cache (or offline map) doesn\'t contain tile for current zoom, attempt to get and rescale tile from N previous zoom\'s</string>
+    <string name="pref_prevz_inet" translatable="false">Tiles from prev zoom\'s (online)</string>
+    <string name="pref_prevz_inet_summary" translatable="false">If online map source doesn\'t contain tile for current zoom, attempt to get and rescale tile from N previous zoom\'s</string>
     <string name="message_wait">Wait a moment, please&#8230;</string>
     <string name="pref_dir">Directories</string>
     <string name="pref_dir_main">Main RMaps directory</string>
@@ -220,7 +221,8 @@ How to and FAQ you can find on http://robertdeveloper.blogspot.com/\n</string>
     <string name="pref_custommap_dialogmessage">For example:\n
 	    http://c.tile.openstreetmap.org/{z}/{x}/{y}.png\n
 	    Addition to the obvious {z}, {x}, {y} you can use {galileo} for Google maps\n
-	    Write me to email if you need to extends this list of parameters.\n	</string>
+	    Write me to email if you need to extends this list of parameters.\n
+	</string>
     <string name="pref_custommap_dialogmessage_md5">MD5 sum of file[s] containing blank tiles\n
 to detect these tiles and get data from\n
 other zooms. Comma separated.</string>
@@ -229,7 +231,7 @@ other zooms. Comma separated.</string>
     <string name="downloader_notif_text">Downloading in progress</string>
     <string name="pref_minzoom">Min zoom</string>
     <string name="pref_maxzoom">Max zoom</string>
-    <string name="pref_maxdnld">Max zoom in src</string>
+    <string name="pref_maxdnld" translatable="false">Max zoom in src</string>
     <string name="menu_sort">Sort</string>
     <string name="menu_sort_name">By name</string>
     <string name="menu_sort_category">By category</string>

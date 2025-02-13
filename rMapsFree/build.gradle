@@ -1,17 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "27.0.1"
+    compileSdkVersion 30
+    //buildToolsVersion "34.0.0"
+    namespace "com.sm.maps"
 
     defaultConfig {
         applicationId "com.sm.maps"
-        minSdkVersion 8
-        targetSdkVersion 22
-       // compileOptions {
-       //     sourceCompatibility JavaVersion.VERSION_1_5
-       //     targetCompatibility JavaVersion.VERSION_1_5
-       // }
+        minSdkVersion 29
+        targetSdkVersion 30
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
     }
 
     buildTypes {
@@ -20,9 +21,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+//    sourceSets {
+//        main {
+//            aidl.srcDirs = ['src/main/aidl']
+//        }
+//    }
 }
 
 dependencies {
-    compile project(':mainActivity')
-    compile 'com.android.support:appcompat-v7:22.2.1'
+    implementation project(':mainActivity')
+    implementation 'com.android.support:appcompat-v7:22.2.1'
+   // implementation 'androidx.appcompat:appcompat:1.6.1'
 }
