@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -108,7 +109,8 @@ public class IndicatorManager implements IndicatorConst {
 		} catch (Exception e) {
 		}
 		try {
-			mLocationManager.addGpsStatusListener(mLocationListener);
+			//mLocationManager.addGpsStatusListener(mLocationListener);
+
 		} catch (Exception e) {
 		}
 
@@ -214,7 +216,7 @@ public class IndicatorManager implements IndicatorConst {
 			((LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE)).requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
 		} catch (Exception e) {
 		}
-		mLocationListener.onGpsStatusChanged(0);
+		//mLocationListener.onGpsStatusChanged(0);
 
 		Intent intent = new Intent(IRemoteService.class.getName());
 		intent.setPackage("com.sm.maps");
@@ -223,7 +225,7 @@ public class IndicatorManager implements IndicatorConst {
 	
 	public void Dismiss(MainActivity ctx) {
 		mLocationManager.removeUpdates(mLocationListener);
-		mLocationManager.removeGpsStatusListener(mLocationListener);
+		//mLocationManager.removeGpsStatusListener(mLocationListener);
 		
 		final JSONObject json = new JSONObject();
 		try {
@@ -263,42 +265,75 @@ public class IndicatorManager implements IndicatorConst {
 		mIndicatorViewList.clear();
 		((ViewGroup) ((MainActivity) ctx).findViewById(R.id.dashboard_area)).removeAllViews();
 	}
-	
-	private class SampleLocationListener implements LocationListener, GpsStatus.Listener {
+	private class SampleLocationListener implements LocationListener {
 		private int mFix = 0;
 		private int mSat = 0;
 		private int mStatus = 0;
 		private String mProvider = "";
-		private GpsStatus mGpsStatus;
+
+		private GnssStatus.Callback gnssStatusCallback = new GnssStatus.Callback() {
+			@Override
+			public void onStarted() {
+				mProvider = GPS;
+				updateIndicator();
+			}
+
+			@Override
+			public void onStopped() {
+				mProvider = OFF;
+				updateIndicator();
+			}
+
+			@Override
+			public void onFirstFix(int ttffMillis) {
+				mFix = 1; // Первый фикс получен
+				updateIndicator();
+			}
+
+			@Override
+			public void onSatelliteStatusChanged(GnssStatus status) {
+				mSat = status.getSatelliteCount();
+				mFix = 0;
+
+				for (int i = 0; i < mSat; i++) {
+					if (status.usedInFix(i)) {
+						mFix++;
+					}
+				}
+
+				updateIndicator();
+			}
+		};
 
 		public SampleLocationListener() {
 			super();
 			mProvider = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ? GPS : OFF;
+			mLocationManager.registerGnssStatusCallback(gnssStatusCallback);
 		}
 
 		@Override
 		public void onLocationChanged(Location location) {
 			mLocation = location;
-			
-			if(location != null) {
+
+			if (location != null) {
 				mIndicators.put(GPSACCURACY, mDf.formatDistance2(location.getAccuracy()));
 				mIndicators.put(GPSELEV, mDf.formatDistance2(location.getAltitude()));
-				mIndicators.put(GPSBEARING, String.format(Locale.UK, "%.1f�", location.getBearing()));
+				mIndicators.put(GPSBEARING, String.format(Locale.UK, "%.1f°", location.getBearing()));
 				mIndicators.put(GPSTIME, sdf.format(location.getTime()));
-				mIndicators.put(GPSLAT, mCf.convertLat(Double.valueOf(location.getLatitude())));
-				mIndicators.put(GPSLON, mCf.convertLon(Double.valueOf(location.getLongitude())));
+				mIndicators.put(GPSLAT, mCf.convertLat(location.getLatitude()));
+				mIndicators.put(GPSLON, mCf.convertLon(location.getLongitude()));
 				mIndicators.put(GPSPROVIDER, location.getProvider());
 				mIndicators.put(GPSSPEED, mDf.formatSpeed2(location.getSpeed()));
-				
+
 				updateIndicator();
 			}
-			
+
 			updateTargetIndicators();
 		}
 
 		@Override
 		public void onProviderDisabled(String provider) {
-			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+			if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
 				mProvider = OFF;
 				updateIndicator();
 			}
@@ -306,7 +341,7 @@ public class IndicatorManager implements IndicatorConst {
 
 		@Override
 		public void onProviderEnabled(String provider) {
-			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+			if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
 				mProvider = GPS;
 				updateIndicator();
 			}
@@ -314,34 +349,104 @@ public class IndicatorManager implements IndicatorConst {
 
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
-			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+			if (provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
 				mStatus = status;
 				updateIndicator();
 			}
 		}
 
-		@Override
-		public void onGpsStatusChanged(int event) {
-			mGpsStatus = mLocationManager.getGpsStatus(mGpsStatus);
-			mFix = 0; mSat = 0;
-			Iterator<GpsSatellite> it = mGpsStatus.getSatellites().iterator();
-			while(it.hasNext()) {
-				mSat++;
-				if(it.next().usedInFix())
-					mFix++;
-			}
-			updateIndicator();
-		}
-		
 		private void updateIndicator() {
-			if(mProvider.equalsIgnoreCase(GPS))
+			if (mProvider.equalsIgnoreCase(GPS))
 				mIndicators.put(GPSPROVIDER, String.format(Locale.UK, "%s %d/%d", mProvider, mFix, mSat));
 			else
 				mIndicators.put(GPSPROVIDER, mProvider);
 			updateIndicatorViewValues();
 		}
-		
+
+		public void unregister() {
+			mLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+		}
 	}
+
+
+//	private class SampleLocationListener implements LocationListener, GpsStatus.Listener {
+//		private int mFix = 0;
+//		private int mSat = 0;
+//		private int mStatus = 0;
+//		private String mProvider = "";
+//		private GpsStatus mGpsStatus;
+//
+//		public SampleLocationListener() {
+//			super();
+//			mProvider = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ? GPS : OFF;
+//		}
+//
+//		@Override
+//		public void onLocationChanged(Location location) {
+//			mLocation = location;
+//
+//			if(location != null) {
+//				mIndicators.put(GPSACCURACY, mDf.formatDistance2(location.getAccuracy()));
+//				mIndicators.put(GPSELEV, mDf.formatDistance2(location.getAltitude()));
+//				mIndicators.put(GPSBEARING, String.format(Locale.UK, "%.1f�", location.getBearing()));
+//				mIndicators.put(GPSTIME, sdf.format(location.getTime()));
+//				mIndicators.put(GPSLAT, mCf.convertLat(Double.valueOf(location.getLatitude())));
+//				mIndicators.put(GPSLON, mCf.convertLon(Double.valueOf(location.getLongitude())));
+//				mIndicators.put(GPSPROVIDER, location.getProvider());
+//				mIndicators.put(GPSSPEED, mDf.formatSpeed2(location.getSpeed()));
+//
+//				updateIndicator();
+//			}
+//
+//			updateTargetIndicators();
+//		}
+//
+//		@Override
+//		public void onProviderDisabled(String provider) {
+//			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+//				mProvider = OFF;
+//				updateIndicator();
+//			}
+//		}
+//
+//		@Override
+//		public void onProviderEnabled(String provider) {
+//			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+//				mProvider = GPS;
+//				updateIndicator();
+//			}
+//		}
+//
+//		@Override
+//		public void onStatusChanged(String provider, int status, Bundle extras) {
+//			if(provider.equalsIgnoreCase(LocationManager.GPS_PROVIDER)) {
+//				mStatus = status;
+//				updateIndicator();
+//			}
+//		}
+//
+//		@Override
+//		public void onGpsStatusChanged(int event) {
+//			mGpsStatus = mLocationManager.getGpsStatus(mGpsStatus);
+//			mFix = 0; mSat = 0;
+//			Iterator<GpsSatellite> it = mGpsStatus.getSatellites().iterator();
+//			while(it.hasNext()) {
+//				mSat++;
+//				if(it.next().usedInFix())
+//					mFix++;
+//			}
+//			updateIndicator();
+//		}
+//
+//		private void updateIndicator() {
+//			if(mProvider.equalsIgnoreCase(GPS))
+//				mIndicators.put(GPSPROVIDER, String.format(Locale.UK, "%s %d/%d", mProvider, mFix, mSat));
+//			else
+//				mIndicators.put(GPSPROVIDER, mProvider);
+//			updateIndicatorViewValues();
+//		}
+//
+//	}
 	
 	public int getOrientation(Activity context) {
 		Display getOrient = context.getWindowManager().getDefaultDisplay();

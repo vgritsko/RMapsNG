@@ -130,7 +130,7 @@ public class TileSourceBase {
 						this.MAP_TYPE = MIXMAP_CUSTOM;
 						this.URL_BUILDER_TYPE = 12;
 						this.ZOOM_MINLEVEL = json.optInt(MixedMapsPreference.MINZOOM, 1)-1;
-						this.ZOOM_MAXLEVEL = json.optInt(MixedMapsPreference.MAXZOOM, 20)-1;
+						this.ZOOM_MAXLEVEL = json.optInt(MixedMapsPreference.MAXZOOM, 7)-1;
 						this.ZOOM_MAXDNLD = json.optInt(MixedMapsPreference.MAXDNLD, this.ZOOM_MAXLEVEL+1)-1;
 						this.MAPTILE_SIZE_FACTOR = json.optDouble(MixedMapsPreference.STRETCH, 1.0f);
 						this.MAPTILE_SIZEPX = (int) (256 * this.MAPTILE_SIZE_FACTOR);

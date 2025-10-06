@@ -28,8 +28,13 @@ public class GeoData {
 	public GeoData(Context context) {
 		mContext = context;
 
-		File folder = Ut.getRMapsMainDir(context, PoiConstants.DATA);
-		mSQLiteOpenHelper = new GeoDataDatabaseOpenHelper(context, folder.getAbsolutePath() + PoiConstants.GEODATA_FILENAME);
+//		File folder = Ut.getRMapsMainDir(context, PoiConstants.DATA);
+//		mSQLiteOpenHelper = new GeoDataDatabaseOpenHelper(context, folder.getAbsolutePath() + PoiConstants.GEODATA_FILENAME);
+		// Используем путь во внутреннем хранилище
+		File internalDbFile = new File(context.getDatabasePath(PoiConstants.GEODATA_FILENAME).getAbsolutePath());
+
+		// Передаём этот путь в SQLiteOpenHelper
+		mSQLiteOpenHelper = new GeoDataDatabaseOpenHelper(context, internalDbFile.getAbsolutePath());
 	}
 	
 	

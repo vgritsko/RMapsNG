@@ -31,8 +31,10 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.sm.maps.applib.R;
+import com.sm.maps.applib.kml.GeoDatabase;
 import com.sm.maps.applib.kml.TrackListActivity;
 import com.sm.maps.applib.kml.TrackStatHelper;
+import com.sm.maps.applib.kml.constants.PoiConstants;
 import com.sm.maps.applib.utils.DistanceFormatter;
 import com.sm.maps.applib.utils.Ut;
 
@@ -163,7 +165,10 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 		final File folder = Ut.getRMapsMainDir(this, "data");
 		if(folder.canRead()){
 			try {
-				db = new DatabaseHelper(this, folder.getAbsolutePath() + "/writedtrack.db").getWritableDatabase();
+				//db = new DatabaseHelper(this, folder.getAbsolutePath() + "/writedtrack.db").getWritableDatabase();
+				File internalDbFile = new File(getApplicationContext().getDatabasePath("writedtrack.db").getAbsolutePath());
+				db = new DatabaseHelper(this, internalDbFile.getAbsolutePath()).getWritableDatabase();
+
 			} catch (Exception e) {
 				db = null;
 			}

@@ -66,7 +66,9 @@ public class Util implements OpenStreetMapViewConstants{
 			out[MAPTILE_LATITUDE_INDEX] = (int)(-baida2[1])/256/(1<<z) + baidu_bounds[zoom]/2;
 		} else {
 			if (aProjection == 1)
-				out[MAPTILE_LATITUDE_INDEX] = (int) Math.floor((1 - Math.log(Math.tan(Math.PI/4 + aLat * Math.PI / 360)) / Math.PI) / 2 * (1 << zoom));
+				out[MAPTILE_LATITUDE_INDEX] = (int) Math.floor((1 - Math
+						.log(Math.tan(Math.PI/4 + aLat * Math.PI / 360))
+						/ Math.PI) / 2 * (1 << zoom));
 			else {
 				final double E2 = (double) aLat * Math.PI / 180;
 				final long sradiusa = 6378137;

@@ -178,7 +178,9 @@ public class TrackListActivity extends ListActivity {
 				File folder = Ut.getRMapsMainDir(TrackListActivity.this, "data");
 				if(folder.canRead()){
 					try {
-						db = new DatabaseHelper(TrackListActivity.this, folder.getAbsolutePath() + "/writedtrack.db").getWritableDatabase();
+						//db = new DatabaseHelper(TrackListActivity.this, folder.getAbsolutePath() + "/writedtrack.db").getWritableDatabase();
+						File internalDbFile = new File(getApplicationContext().getDatabasePath("writedtrack.db").getAbsolutePath());
+						db = new DatabaseHelper(TrackListActivity.this, internalDbFile.getAbsolutePath()).getWritableDatabase();
 					} catch (Exception e) {
 						db = null;
 					}

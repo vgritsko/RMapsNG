@@ -22,6 +22,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
 
+import java.io.File;
+
 /**
  * A helper class to manage database creation and version management.
  * You create a subclass implementing {@link #onCreate}, {@link #onUpgrade} and
@@ -34,7 +36,7 @@ import android.util.Log;
 public abstract class RSQLiteOpenHelper {
     private static final String TAG = RSQLiteOpenHelper.class.getSimpleName();
 
-//    private final Context mContext;
+    private final Context mContext;
     private final String mName;
     private final CursorFactory mFactory;
     private final int mNewVersion;
@@ -56,7 +58,7 @@ public abstract class RSQLiteOpenHelper {
     public RSQLiteOpenHelper(Context context, String name, CursorFactory factory, int version) {
         if (version < 1) throw new IllegalArgumentException("Version must be >= 1, was " + version);
 
-//        mContext = context;
+        mContext = context;
         mName = name;
         mFactory = factory;
         mNewVersion = version;
@@ -100,6 +102,15 @@ public abstract class RSQLiteOpenHelper {
 //                db = mContext.openOrCreateDatabase(mName, 0, mFactory);
             	Ut.d("RSQLiteOpenHelper: Open database " + mName);
                 db = SQLiteDatabase.openOrCreateDatabase(mName, mFactory);
+                Log.d("TAG","RSQLiteOpenHelper: Open database " + mName);
+                Log.d("TAG","internal path" + mContext.getFilesDir());
+                File dbFile = new File(mName);
+                if (!dbFile.exists()) {
+                    Log.e("TAG", "Файл базы данных не найден!");
+                }
+                if (!dbFile.canRead()) {
+                    Log.e("TAG", "Нет доступа к чтению файла!");
+                }
             }
 
             int version = db.getVersion();

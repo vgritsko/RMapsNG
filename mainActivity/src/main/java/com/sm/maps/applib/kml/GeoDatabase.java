@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
 import com.sm.maps.applib.R;
+import com.sm.maps.applib.data.GeoData;
 import com.sm.maps.applib.kml.constants.PoiConstants;
 import com.sm.maps.applib.utils.RSQLiteOpenHelper;
 import com.sm.maps.applib.utils.Ut;
@@ -185,7 +186,9 @@ public class GeoDatabase implements PoiConstants{
 
 		SQLiteDatabase db;
 		try {
-			db = new GeoDatabaseHelper(mCtx, folder.getAbsolutePath() + GEODATA_FILENAME).getWritableDatabase();
+			//db = new GeoDatabaseHelper(mCtx, folder.getAbsolutePath() + GEODATA_FILENAME).getWritableDatabase();
+			File internalDbFile = new File(mCtx.getDatabasePath(PoiConstants.GEODATA_FILENAME).getAbsolutePath());
+			db = new GeoDatabaseHelper(mCtx, internalDbFile.getAbsolutePath()).getWritableDatabase();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

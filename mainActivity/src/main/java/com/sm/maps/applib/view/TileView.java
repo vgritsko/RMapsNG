@@ -21,6 +21,8 @@ import android.preference.PreferenceManager;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.MotionEventCompat;
 import androidx.core.view.ScaleGestureDetectorCompat;
+
+import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -463,6 +465,7 @@ public class TileView extends View {
 	}
 
 	public void zoomOut() {
+		Log.d("TILEVIEW", "Tile ZoomOut clicked");
 
 		if (mTouchScale > 1.1) {
 			setZoomLevel(getZoomLevel(), true);

@@ -21,6 +21,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.utils.ICacheProvider;
@@ -84,6 +85,7 @@ public class TileProviderBase {
 		if (mSourceType != SRC_WRAPPER) {
 			mThreadPool.execute(new Runnable() {
 				public void run() {
+					Log.d("VAD", "1'st level dispatcher - main zoom from Cache or local source");
 					XYZ xyz;
 					Collection<XYZ> col;
 					Iterator<XYZ> it;
@@ -155,7 +157,7 @@ public class TileProviderBase {
 									y = xyz.Y / (1 << az);
 									xm = xyz.X & ((1 << az) - 1);
 									ym = xyz.Y & ((1 << az) - 1);
-									if (z > 0 && z <= getTileSource().ZOOM_MAXDNLD) {
+									if (z > 0 /*&& z <= getTileSource().ZOOM_MAXLEVEL*/) {
 //                                    zbmp = mPrevCachedCache.getMapTile(prevZurl);
 //                                    if (zbmp == null) {
 										data = getSingleTile(x, y, z);
@@ -250,6 +252,7 @@ public class TileProviderBase {
 		if (mSourceType == SRC_ONLINE) {
 			mThreadPool.execute(new Runnable() {
 				public void run() {
+					Log.d("VAD","2'nd level dispatcher #1 - other zoom's from cache");
 					XYZ xyz;
 					Collection<XYZ> col;
 					Iterator<XYZ> it;
@@ -355,6 +358,7 @@ public class TileProviderBase {
 			// 2'nd level dispatcher #2 - download from internet
 			mThreadPool.execute(new Runnable() {
 				public void run() {
+					Log.d("VAD", "'nd level dispatcher #2 - download from internet");
 					XYZ xyz;
 					Collection<XYZ> col;
 					Iterator<XYZ> it;
@@ -426,6 +430,7 @@ public class TileProviderBase {
 		}
 
 		public void run() {
+			Log.d("VAD", "Starting download thread");
 
 			byte[] data = null;
 			Bitmap bmp = null;
@@ -436,17 +441,22 @@ public class TileProviderBase {
 				do {
 					try {
 						data = getSingleTile(mTileURLGenerator.getRealURL(mXYZ.TILEURL, mXYZ.X, mXYZ.Y));
+                        Log.d("VAD", "Real URL" + mTileURLGenerator.getRealURL(mXYZ.TILEURL, mXYZ.X, mXYZ.Y));
 					} catch (Exception e) {
 						data = null;
+                        Log.d("VAD", "Exception data null");
 					}
 
 					blank = isBlank(data);
+                    Log.d("VAD", "blank "+ blank);
 
 					if (data != null && !blank)
 						try {
 							bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                            Log.d("VAD", "Decode bitmap");
 						} catch (Exception e) {
 							bmp = null;
+                            Log.d("VAD", e.getMessage());
 						}
 
 					ii = ii + 1;
@@ -460,6 +470,7 @@ public class TileProviderBase {
 				try {
 					mCacheProvider.putTile(mXYZ.TILEURL, mXYZ.X, mXYZ.Y, mXYZ.Z, data);
 				} catch (Exception e) {
+                    Log.d("VAD", e.getMessage());
 				}
 			}
 
@@ -530,8 +541,10 @@ public class TileProviderBase {
 				mPendTileReq.notifyAll();
 			}
 
-			if (bmp != null)
+			if (bmp != null){
+                Log.d("VAD", "Send message succes");
 				SendMessageSuccess();
+            }
 		}
 	}
 
@@ -567,20 +580,20 @@ public class TileProviderBase {
 	public Bitmap getTile(final int x, final int y, final int z) {
 		return mLoadingMapTile;
 	}
-	
+
 	public void removeTile(final String aTileURLString) {
 		if(mTileCache != null)
 			mTileCache.removeTile(aTileURLString);
 	}
-	
+
 	public void removeTileFromCache(final int x, final int y, final int z) {
 	}
-	
+
 	protected void SendMessageSuccess() {
 		if(mCallbackHandler != null)
 			Message.obtain(mCallbackHandler, MessageHandlerConstants.MAPTILEFSLOADER_SUCCESS_ID).sendToTarget();
 	}
-	
+
 	protected void SendMessageFail() {
 		if(mCallbackHandler != null)
 			Message.obtain(mCallbackHandler, MessageHandlerConstants.MAPTILEFSLOADER_FAIL_ID).sendToTarget();
@@ -589,12 +602,12 @@ public class TileProviderBase {
 	public void setHandler(Handler mTileMapHandler) {
 		mCallbackHandler = mTileMapHandler;
 	}
-	
+
 	public void ResizeCashe(final int size) {
 		if(mTileCache != null)
 			mTileCache.Resize(size);
 	}
-	
+
 	public void CommitCashe() {
 		if(mTileCache != null)
 			mTileCache.Commit();
@@ -602,21 +615,21 @@ public class TileProviderBase {
 
 	public void updateMapParams(TileSource tileSource) {
 	}
-	
+
 	public boolean needIndex(final String aCashTableName, final long aSizeFile, final long aLastModifiedFile, final boolean aBlockIndexing) {
 		return false;
 	}
-	
+
 	public void Index() {
-		
+
 	}
-	
+
 	public void setLoadingMapTile(Bitmap aLoadingMapTile) {
 		if(mLoadingMapTile != null)
 			mLoadingMapTile.recycle();
 		mLoadingMapTile = aLoadingMapTile;
 	}
-	
+
 	public double getTileLength() {
 		return 0;
 	}

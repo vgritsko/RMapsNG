@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.View;
@@ -209,6 +210,7 @@ public class MapView extends RelativeLayout {
         ivZoomIn.setOnClickListener(new OnClickListener(){
 			// @Override
 			public void onClick(View v) {
+				Log.d("MAPVIEW", "ZoomIn clicked");
 				mTileView.zoomIn();
 				if(mMoveListener != null)
 					mMoveListener.onZoomDetected();
@@ -249,6 +251,7 @@ public class MapView extends RelativeLayout {
         ivZoomOut.setOnClickListener(new OnClickListener(){
 			// @Override
 			public void onClick(View v) {
+				Log.d("MAPVIEW", "ZoomOut clicked");
 				mTileView.zoomOut();
 				if(mMoveListener != null)
 					mMoveListener.onZoomDetected();

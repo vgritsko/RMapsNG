@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -23,6 +24,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.constants.PrefConstants;
@@ -63,10 +66,10 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 		final String sdf = aPref.getString("pref_dir_main", "NO");
 		if(sdf.equalsIgnoreCase("NO")) {
 			final Editor editor = aPref.edit();
-			editor.putString("pref_dir_main", Ut.getExternalStorageDirectory()+"/rmaps/");
-			editor.putString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/");
-			editor.putString("pref_dir_import", Ut.getExternalStorageDirectory()+"/rmaps/import/");
-			editor.putString("pref_dir_export", Ut.getExternalStorageDirectory()+"/rmaps/export/");
+			editor.putString("pref_dir_main", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/");
+			editor.putString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/");
+			editor.putString("pref_dir_import", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/import/");
+			editor.putString("pref_dir_export", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/export/");
 			editor.commit();
 		}
 		
@@ -78,40 +81,28 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 		((ListPreference) findPreference("pref_arrow_icon")).setEntries((String[])arrEntry.toArray(new String[arrEntry.size()]));
 		((ListPreference) findPreference("pref_arrow_icon")).setEntryValues((String[])arrEntryValues.toArray(new String[arrEntry.size()]));
 		
-		findPreference("pref_dir_main").setSummary(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory()+"/rmaps/"));
-		findPreference("pref_dir_maps").setSummary(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/"));
-		findPreference("pref_main_usermaps").setSummary("Maps from "+aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/"));
-		findPreference("pref_dir_import").setSummary(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory()+"/rmaps/import/"));
-		findPreference("pref_dir_export").setSummary(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory()+"/rmaps/export/"));
+		findPreference("pref_dir_main").setSummary(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/"));
+		findPreference("pref_dir_maps").setSummary(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/"));
+		findPreference("pref_main_usermaps").setSummary("Maps from "+aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/"));
+		findPreference("pref_dir_import").setSummary(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/import/"));
+		findPreference("pref_dir_export").setSummary(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/export/"));
 		
-		findPreference("pref_dir_main").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(Preference preference) {
-				pickDir(R.string.pref_dir_main, Uri.parse(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory()+"/rmaps/")));
-				return false;
-			}
-		});
-		findPreference("pref_dir_maps").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(Preference preference) {
-				pickDir(R.string.pref_dir_maps, Uri.parse(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/")));
-				return false;
-			}
-		});
-		findPreference("pref_dir_import").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(Preference preference) {
-				pickDir(R.string.pref_dir_import, Uri.parse(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory()+"/rmaps/import/")));
-				return false;
-			}
-		});
-		findPreference("pref_dir_export").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			@Override
-			public boolean onPreferenceClick(Preference preference) {
-				pickDir(R.string.pref_dir_export, Uri.parse(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory()+"/rmaps/export/")));
-				return false;
-			}
-		});
+		findPreference("pref_dir_main").setOnPreferenceClickListener(preference -> {
+            pickDir(R.string.pref_dir_main, Uri.parse(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/")));
+            return false;
+        });
+		findPreference("pref_dir_maps").setOnPreferenceClickListener(preference -> {
+            pickDir(R.string.pref_dir_maps, Uri.parse(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/")));
+            return false;
+        });
+		findPreference("pref_dir_import").setOnPreferenceClickListener(preference -> {
+            pickDir(R.string.pref_dir_import, Uri.parse(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/import/")));
+            return false;
+        });
+		findPreference("pref_dir_export").setOnPreferenceClickListener(preference -> {
+            pickDir(R.string.pref_dir_export, Uri.parse(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/export/")));
+            return false;
+        });
 		
 
 		final PreferenceGroup prefMapsgroup = (PreferenceGroup) findPreference("pref_predefmaps_mapsgroup");
@@ -191,7 +182,7 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 
 		final SharedPreferences aPref = PreferenceManager.getDefaultSharedPreferences(this);
 		final Editor prefEditor = aPref.edit();
-		
+
 		final File[] files = folder.listFiles();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -232,11 +223,11 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 		Ut.w(aKey);
 
 		if(aKey.equalsIgnoreCase("pref_dir_maps")){
-			findPreference("pref_main_usermaps").setSummary("Maps from "+aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/"));
-			findPreference(aKey).setSummary(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/"));
+			findPreference("pref_main_usermaps").setSummary("Maps from "+aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/"));
+			findPreference(aKey).setSummary(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/"));
 
 
-			final File dir = new File(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory()+"/rmaps/maps/").concat("/").replace("//", "/"));
+			final File dir = new File(aPref.getString("pref_dir_maps", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/maps/").concat("/").replace("//", "/"));
 			if(!dir.exists()){
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)){
 					dir.mkdirs();
@@ -246,9 +237,9 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 				LoadUserMaps(dir);
 		}
 		else if(Ut.equalsIgnoreCase(aKey, 0, 9, "pref_dir_")) {
-			findPreference("pref_dir_main").setSummary(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory()+"/rmaps/"));
-			findPreference("pref_dir_import").setSummary(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory()+"/rmaps/import/"));
-			findPreference("pref_dir_export").setSummary(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory()+"/rmaps/export/"));
+			findPreference("pref_dir_main").setSummary(aPref.getString("pref_dir_main", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/"));
+			findPreference("pref_dir_import").setSummary(aPref.getString("pref_dir_import", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/import/"));
+			findPreference("pref_dir_export").setSummary(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/export/"));
 		}
 		else if(aKey.equalsIgnoreCase("pref_locale")) {
 			Locale locale = ((MapApplication) getApplication()).getDefLocale();
@@ -282,5 +273,4 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 				
 		}
 	}
-	
 }

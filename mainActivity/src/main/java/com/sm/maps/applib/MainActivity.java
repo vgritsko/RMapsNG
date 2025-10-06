@@ -53,14 +53,20 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.provider.SearchRecentSuggestions;
+
+import androidx.annotation.NonNull;
 import androidx.core.view.ViewConfigurationCompat;
+
+import android.provider.Settings;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -169,7 +175,8 @@ public class MainActivity extends AppCompatActivity {
 	private ImageView mMainMenu = null;
 	private ExecutorService mThreadPool = Executors.newSingleThreadExecutor(new SimpleThreadFactory("MainActivity.Search"));
 
-	private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+	private static final int PERMISSIONS_REQUEST_CODE = 1;
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -182,27 +189,36 @@ public class MainActivity extends AppCompatActivity {
 //        mTracker = GoogleAnalyticsTracker.getInstance();
 //        mTracker.startNewSession("UA-10715419-3", 20, this);
 
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-				!= PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-					LOCATION_PERMISSION_REQUEST_CODE);
-		}
+		requestPermissionsIfNeeded();
+
+//		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+//				ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+//				ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//
+//			ActivityCompat.requestPermissions(this,
+//					new String[]{
+//							Manifest.permission.ACCESS_FINE_LOCATION,
+//							Manifest.permission.ACCESS_COARSE_LOCATION,
+//							Manifest.permission.READ_EXTERNAL_STORAGE,
+//							Manifest.permission.WRITE_EXTERNAL_STORAGE
+//					},
+//					PERMISSIONS_REQUEST_CODE);
+//		}
 
 		mHasMenuButton = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(this));
 
 		CreateContentView();
-		
+
 		mPoiManager = new PoiManager(this);
 		mLocationListener = new SampleLocationListener();
 		mMap.setMoveListener(mMoveListener);
 		//if(!OpenStreetMapViewConstants.DEBUGMODE)
-			mOrientationSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+		mOrientationSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
  		SharedPreferences uiState = getPreferences(Activity.MODE_PRIVATE);
 
- 		// Init 
+ 		// Init
  		mPrefOverlayButtonBehavior = Integer.parseInt(pref.getString("pref_overlay_button_behavior", "0"));
  		mPrefOverlayButtonVisibility = Integer.parseInt(pref.getString("pref_overlay_button_visibility", "0"));
  		if(mPrefOverlayButtonVisibility == 1) // Always hide
@@ -210,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 		mCompassEnabled = uiState.getBoolean("CompassEnabled", false);
 		mCompassView.setVisibility(mCompassEnabled ? View.VISIBLE : View.INVISIBLE);
 		mAutoFollow = uiState.getBoolean("AutoFollow", true);
-		
+
 		mMap.getController().setCenter(new GeoPoint(uiState.getInt("Latitude", 0), uiState.getInt("Longitude", 0)));
 		mGPSFastUpdate = pref.getBoolean("pref_gpsfastupdate", true);
 		mAutoFollow = uiState.getBoolean("AutoFollow", true);
@@ -224,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
         this.mSearchResultOverlay = new SearchResultOverlay(this, mMap);
         mSearchResultOverlay.fromPref(uiState);
         FillOverlays();
-        
+
 		mDrivingDirectionUp = pref.getBoolean("pref_drivingdirectionup", true);
 		mNorthDirectionUp = pref.getBoolean("pref_northdirectionup", true);
 
@@ -244,21 +260,21 @@ public class MainActivity extends AppCompatActivity {
 			showDialog(R.id.error);
 		}
 
-		
+
 		if (!uiState.getString("app_version", "").equalsIgnoreCase(Ut.getAppVersion(this))) {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
-			
+
 //			mTracker.setCustomVar(1, "Build", Ut.getAppVersion(this), 1);
 //			mTracker.setCustomVar(2, "Ver", Ut.getPackVersion(this), 1);
 //			mTracker.setCustomVar(3, "DisplaySize", ""+Math.min(metrics.widthPixels, metrics.heightPixels)+"x"+Math.max(metrics.widthPixels, metrics.heightPixels), 1);
 //			mTracker.setCustomVar(4, "DisplayDensity", ""+(int)(160*metrics.density), 1);
 //			mTracker.setCustomVar(5, "APILevel", Build.VERSION.SDK, 1);
 //			mTracker.trackPageView("/InstallApp");
-			
+
 			showDialog(R.id.whatsnew);
 		}
-		
+
 		final Intent queryIntent = getIntent();
 		final String queryAction = queryIntent.getAction();
 
@@ -274,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 					final String query = uri.getEncodedQuery().replace("q=", "");
 					queryIntent.putExtra(SearchManager.QUERY, query);
 					doSearchQuery(queryIntent);
-					
+
 				} else {
 					GeoPoint point = GeoPoint.fromDoubleString(latlon);
 					mPoiOverlay.clearPoiList();
@@ -284,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		} else if("SHOW_MAP_ID".equalsIgnoreCase(queryAction)) {
-			final Bundle bundle = queryIntent.getExtras(); 
+			final Bundle bundle = queryIntent.getExtras();
 			mMapId = bundle.getString(MAPNAME);
 			if(bundle.containsKey("center")) {
 				try {
@@ -307,17 +323,84 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-			if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+	private void requestPermissionsIfNeeded() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			// Проверяем, есть ли полный доступ к файлам (MANAGE_EXTERNAL_STORAGE)
+			if (!Environment.isExternalStorageManager()) {
+				try {
+					Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+					intent.setData(Uri.parse("package:" + getPackageName()));
+					startActivity(intent);
+				} catch (Exception e) {
+					Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+					startActivity(intent);
+				}
+			}
+		}
 
+		// Проверяем остальные разрешения (геолокация + старые разрешения к файлам)
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+				ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+				(Build.VERSION.SDK_INT < Build.VERSION_CODES.R &&
+						(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+								ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))) {
+
+			ActivityCompat.requestPermissions(this,
+					new String[]{
+							Manifest.permission.ACCESS_FINE_LOCATION,
+							Manifest.permission.ACCESS_COARSE_LOCATION,
+							Manifest.permission.READ_EXTERNAL_STORAGE,
+							Manifest.permission.WRITE_EXTERNAL_STORAGE
+					},
+					PERMISSIONS_REQUEST_CODE);
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if (requestCode == PERMISSIONS_REQUEST_CODE) {
+			boolean allPermissionsGranted = true;
+			for (int grantResult : grantResults) {
+				if (grantResult != PackageManager.PERMISSION_GRANTED) {
+					allPermissionsGranted = false;
+					break;
+				}
+			}
+			if (allPermissionsGranted) {
+				Log.d("DEBUG", "Все разрешения получены!");
 			} else {
-				Toast.makeText(this, "Разрешение на доступ к локации отклонено", Toast.LENGTH_LONG).show();
+				Log.d("DEBUG", "Не все разрешения получены!");
 			}
 		}
 	}
+
+
+
+
+//	@Override
+//	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//		if (requestCode == PERMISSIONS_REQUEST_CODE) {
+//			if (grantResults.length > 0) {
+//				boolean locationPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+//				boolean storagePermissionGranted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+//				boolean storageWritePermissionGranted = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+//
+//				if (locationPermissionGranted && storagePermissionGranted) {
+//					Log.d("GRANT", String.valueOf(grantResults[0]));
+//					Log.d("GRANT", String.valueOf(grantResults[1]));
+//					Log.d("GRANT", String.valueOf(grantResults[2]));
+//
+//
+//				} else {
+//					// Разрешение отклонено, уведомляем пользователя
+//					Toast.makeText(this, "Необходимы разрешения для работы с локацией и хранилищем", Toast.LENGTH_SHORT).show();
+//				}
+//			}
+//		}
+//	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -739,6 +822,9 @@ public class MainActivity extends AppCompatActivity {
 		mOverlayId = uiState.getString("OverlayID", "");
 		mShowOverlay = uiState.getBoolean("ShowOverlay", true);
 		mMyLocationOverlay.setTargetLocation(GeoPoint.fromDoubleStringOrNull(uiState.getString("targetlocation", "")));
+
+		Log.d("TAG", "mapId " + mMapId);
+		Log.d("TAG","mapId " + mOverlayId);
 		
 		setTileSource(mMapId, mOverlayId, mShowOverlay);
 		mMapId = null;
@@ -1187,9 +1273,13 @@ public class MainActivity extends AppCompatActivity {
 			}
 		} else {
 			try {
+				// источник тайлов Тайлы (tiles) — это изображения отдельных частей карты, которые загружаются и отображаются на экране пользователя.
 				mTileSource = new TileSource(this, TileSource.MAPNIK);
-			} catch (SQLiteException e) {
-			} catch (RException e) {
+			}
+			catch (SQLiteException e)
+			{
+			}
+			catch (RException e) {
 			}
 		}
 		

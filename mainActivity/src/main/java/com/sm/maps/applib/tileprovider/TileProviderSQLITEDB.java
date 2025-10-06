@@ -31,6 +31,7 @@ public class TileProviderSQLITEDB extends TileProviderFileBase {
 		mTileURLGenerator = new TileURLGeneratorBase(filename);
 		mTileCache = aTileCache == null ? new MapTileMemCache() : aTileCache;
 		mUserMapDatabase = new SQLiteMapDatabase();
+		mUserMapDatabase.setContext(ctx);
 		mUserMapDatabase.setFile(filename);
 		mMapID = mapid;
 
@@ -105,8 +106,28 @@ public class TileProviderSQLITEDB extends TileProviderFileBase {
 	}
 
 	public Bitmap getTile(final int x, final int y, final int z) {
+//		int [] arr = latLngToPixel(x,y,z);
+//		int newX = x/(256*32);
+//		int newY = y/(256*32);
+//		int newZ = z-13;
+//		return getTileFromSource(newX, newY, newZ);
 		return getTileFromSource(x, y, z);
 	}
+
+	public static int[] latLngToPixel(double lat, double lng, int zoom) {
+		final int TILE_SIZE = 256;
+		double sinLat = Math.sin(Math.toRadians(lat));
+		double scale = (1 << zoom) * TILE_SIZE;
+
+		double x = (lng + 180.0) / 360.0;
+		double y = 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI);
+
+		int pixelX = (int) Math.floor(x * scale);
+		int pixelY = (int) Math.floor(y * scale);
+
+		return new int[]{pixelX, pixelY, zoom};
+	}
+
 
 	public int[] findTheMap(int zoomLevel) {
 		return mUserMapDatabase.findTheMap(zoomLevel);

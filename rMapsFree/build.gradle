@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.sm.maps"
-        minSdkVersion 29
+        minSdkVersion 26
         targetSdkVersion 33
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_17

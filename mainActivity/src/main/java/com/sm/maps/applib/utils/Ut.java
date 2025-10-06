@@ -183,33 +183,86 @@ public class Ut implements OpenStreetMapConstants, OpenStreetMapViewConstants, P
 		return name.replace(".", "_").replace(" ", "_").replace("-", "_").trim();
 	}
 
-	private static File getDir(final Context mCtx, final String aPref, final String aDefaultDirName, final String aFolderName) {
-		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mCtx);
-		final String dirName = pref.getString(aPref, aDefaultDirName)+"/"+aFolderName+"/";
+//	private static File getDir(final Context mCtx, final String aPref, final String aDefaultDirName, final String aFolderName) {
+//		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mCtx);
+//		final String dirName = pref.getString(aPref, aDefaultDirName)+"/"+aFolderName+"/";
+//
+//		final File dir = new File(dirName.replace("//", "/").replace("//", "/"));
+//		if(!dir.exists()){
+//			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)){
+//				dir.mkdirs();
+//			}
+//		}
+//
+//		return dir;
+//	}
+private static File getDir(final Context context, final String aPref, final String aDefaultDirName, final String aFolderName) {
+	SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+	String subDirName = pref.getString(aPref, aDefaultDirName) + aFolderName;
 
-		final File dir = new File(dirName.replace("//", "/").replace("//", "/"));
-		if(!dir.exists()){
-			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)){
-				dir.mkdirs();
-			}
+	// Получаем путь к папке "Documents" внутри Scoped Storage
+//	File documentsDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), subDirName);
+//	Log.d("Storage","subDir folder: " + subDirName);
+//	Log.d("Storage","getDir folder: " + documentsDir.getAbsolutePath());
+	File documentsDir = new File(subDirName);
+	Log.d("Storage", "getDir created: " + documentsDir.getAbsolutePath());
+
+	// Создаём папку, если её нет
+	if (!documentsDir.exists()) {
+		boolean created = documentsDir.mkdirs();
+		Log.d("Storage", "getDir created: " + documentsDir.getAbsolutePath());
+		if (!created) {
+			Log.e("Storage", "Can't create folder: " + documentsDir.getAbsolutePath());
 		}
-
-		return dir;
 	}
+
+	return documentsDir;
+}
 	
 	private static String EXTERNAL_SD = "/storage/extSdCard";
 	private static String SIGNAL_FILE_NAME = "/RMapsOnSDCard";
 	
-	public static String getExternalStorageDirectory() {
-		final File signalFile = new File(Environment.getExternalStorageDirectory().getPath()+SIGNAL_FILE_NAME);
-		if(signalFile.exists())
-			return (EXTERNAL_SD);
-		else
-			return Environment.getExternalStorageDirectory().getPath();
+//	public static String getExternalStorageDirectory() {
+//		final File signalFile = new File(Environment.getExternalStorageDirectory().getPath()+SIGNAL_FILE_NAME);
+//		if(signalFile.exists())
+//			return (EXTERNAL_SD);
+//		else
+//			return Environment.getExternalStorageDirectory().getPath();
+//	}
+public static String getExternalStorageDirectory(Context context) {
+//	File[] externalDirs = context.getExternalFilesDirs(null);
+//
+//	// Основная память (Internal Storage)
+//	File primaryStorage = externalDirs[0];
+//
+//	// Проверяем, есть ли вторая (внешняя) SD-карта
+//	if (externalDirs.length > 1 && externalDirs[1] != null) {
+//		File externalSd = externalDirs[1];
+//
+//		// Проверяем существование файла-сигнала на SD-карте
+//		File signalFile = new File(externalSd, SIGNAL_FILE_NAME);
+//		if (signalFile.exists()) {
+//			return externalSd.getAbsolutePath(); // Возвращаем путь к SD-карте
+//		}
+//	}
+//
+//	return primaryStorage.getAbsolutePath(); // Возвращаем путь к основной памяти
+	File publicDocumentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+	Log.d("Storage","created public dir" + publicDocumentsDir.getAbsolutePath());
+
+	if (!publicDocumentsDir.exists()) {
+		boolean created = publicDocumentsDir.mkdirs();
+		if (!created) {
+			Log.e("Storage", "Can't create directory: " + publicDocumentsDir.getAbsolutePath());
+		}
 	}
 
+	return publicDocumentsDir.getAbsolutePath();
+}
+
+
 	public static File getRMapsMainDir(final Context mCtx, final String aFolderName) {
-		return getDir(mCtx, "pref_dir_main", Ut.getExternalStorageDirectory()+"/rmaps/", aFolderName);
+		return getDir(mCtx, "pref_dir_main", Ut.getExternalStorageDirectory(mCtx.getApplicationContext())+"/rmaps/", aFolderName);
 	}
 
 	public static File getRMapsMapsDir(final Context mCtx) {

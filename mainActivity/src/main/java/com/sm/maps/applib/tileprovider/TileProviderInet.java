@@ -15,6 +15,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.util.Log;
 
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.utils.RException;
@@ -37,7 +38,9 @@ public class TileProviderInet extends TileProviderBase {
             mTileCache = aTileCache;
         if (cacheDatabaseName != null) {
             final SQLiteMapDatabase cacheDatabase = new SQLiteMapDatabase();
+			cacheDatabase.setContext(mCtx);
             final File folder = Ut.getRMapsMainDir(ctx, "cache");
+			Log.d("TileProvider","tile provider: " + folder.getAbsolutePath() + " database:" + cacheDatabaseName);
             cacheDatabase.setFile(folder.getAbsolutePath() + "/" + cacheDatabaseName + ".sqlitedb");
             mCacheProvider = cacheDatabase;
         } else {

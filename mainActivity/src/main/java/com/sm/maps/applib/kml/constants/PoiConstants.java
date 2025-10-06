@@ -43,7 +43,7 @@ public interface PoiConstants {
 	public static final String TRACKS = "tracks";
 	public static final String TRACKPOINTS = "trackpoints";
 	public static final String DATA = "data";
-	public static final String GEODATA_FILENAME = "/geodata.db";
+	public static final String GEODATA_FILENAME = "geodata.db";
 	public static final String TRACK = "Track";
 	public static final String PARAMS = "params";
 	public static final String MAPS = "maps";

@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import com.sm.maps.applib.MainActivity;
 import com.sm.maps.applib.kml.PoiManager;
 import com.sm.maps.applib.kml.Track;
+import com.sm.maps.applib.trackwriter.DatabaseHelper;
 import com.sm.maps.applib.trackwriter.IRemoteService;
 import com.sm.maps.applib.trackwriter.ITrackWriterCallback;
 import com.sm.maps.applib.utils.SimpleThreadFactory;
@@ -114,7 +115,9 @@ public class CurrentTrackOverlay extends TileViewOverlay {
 			if(folder.canRead()){
 				SQLiteDatabase db = null;
 				try {
-					db = new com.sm.maps.applib.trackwriter.DatabaseHelper(mContext, folder.getAbsolutePath() + "/writedtrack.db").getReadableDatabase();
+					//db = new com.sm.maps.applib.trackwriter.DatabaseHelper(mContext, folder.getAbsolutePath() + "/writedtrack.db").getReadableDatabase();
+					File internalDbFile = new File(mContext.getDatabasePath("writedtrack.db").getAbsolutePath());
+					db = new DatabaseHelper(mContext, internalDbFile.getAbsolutePath()).getReadableDatabase();
 				} catch (Exception e) {
 					db = null;
 				}
