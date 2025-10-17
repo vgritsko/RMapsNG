@@ -10,9 +10,13 @@ import java.util.TimeZone;
 import org.andnav.osm.util.constants.OpenStreetMapConstants;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -125,6 +129,17 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
+		// Create notification channel for Android 8.0+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(
+					"track_writer_channel",
+					getString(R.string.remote_service_started),
+					NotificationManager.IMPORTANCE_LOW
+			);
+			channel.setDescription("Track writer service notifications");
+			mNM.createNotificationChannel(channel);
+		}
+
 	    try {
 	        mStartForeground = getClass().getMethod("startForeground",
 	                mStartForegroundSignature);
@@ -196,13 +211,16 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 	private void showNotification() {
 		CharSequence text = getText(R.string.remote_service_started);
 
-		mNotification = new Notification(R.drawable.track_writer_service, text, System.currentTimeMillis());
-		mNotification.flags = mNotification.flags | Notification.FLAG_NO_CLEAR;
-
 		mContentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, TrackListActivity.class), 0);
+				new Intent(this, TrackListActivity.class), PendingIntent.FLAG_IMMUTABLE);
 
-//		mNotification.setLatestEventInfo(this, getText(R.string.remote_service_started), text, mContentIntent);
+		mNotification = new NotificationCompat.Builder(this, "track_writer_channel")
+				.setSmallIcon(R.drawable.track_writer_service)
+				.setContentTitle(getText(R.string.remote_service_started))
+				.setContentText(text)
+				.setContentIntent(mContentIntent)
+				.setOngoing(true)
+				.build();
 
 		startForegroundCompat(R.string.remote_service_started, mNotification);
 	}
@@ -250,7 +268,15 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 						+" | " + mDf.formatDistance(mTrackStat.Distance)
 						+" | " + mDf.formatSpeed(mTrackStat.AvgSpeed)
 						;
-				//mNotification.setLatestEventInfo(TrackWriterService.this, getText(R.string.remote_service_started), text, mContentIntent);
+
+				mNotification = new NotificationCompat.Builder(TrackWriterService.this, "track_writer_channel")
+						.setSmallIcon(R.drawable.track_writer_service)
+						.setContentTitle(getText(R.string.remote_service_started))
+						.setContentText(text)
+						.setContentIntent(mContentIntent)
+						.setOngoing(true)
+						.build();
+
 				mNM.notify(R.string.remote_service_started, mNotification);
 			}
 		}
@@ -309,6 +335,23 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 	 * APIs if it is not available.
 	 */
 	void startForegroundCompat(int id, Notification notification) {
+	    // Use modern startForeground API with foreground service type for Android 10+ (API 29+)
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+	        try {
+	            startForeground(id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION);
+	        } catch (Exception e) {
+	            // Fallback if the new API fails
+	            startForeground(id, notification);
+	        }
+	        return;
+	    }
+
+	    // Use modern startForeground API directly for Android 5.0+
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+	        startForeground(id, notification);
+	        return;
+	    }
+
 	    // If we have the new startForeground API, then use it.
 	    if (mStartForeground != null) {
 	        mStartForegroundArgs[0] = Integer.valueOf(id);
@@ -328,6 +371,12 @@ public class TrackWriterService extends Service implements OpenStreetMapConstant
 	 * APIs if it is not available.
 	 */
 	void stopForegroundCompat(int id) {
+	    // Use modern stopForeground API directly for Android 5.0+
+	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+	        stopForeground(true);
+	        return;
+	    }
+
 	    // If we have the new stopForeground API, then use it.
 	    if (mStopForeground != null) {
 	        mStopForegroundArgs[0] = Boolean.TRUE;
