@@ -29,24 +29,35 @@ public class CheckBoxPreferenceExt extends Preference implements CompoundButton.
 		super(context, null, android.R.attr.checkBoxPreferenceStyle);
 		mDefaultValueChecked = defValue;
 		mPrefKeyChecked = keyChecked;
-		
+
 		mChecked = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(mPrefKeyChecked, mDefaultValueChecked);
 	}
 
 	@Override
 	public View getView(View convertView, ViewGroup parent) {
 		View view = super.getView(convertView, parent);
-		
+
+		// Read current state from SharedPreferences to handle view recycling correctly
+		mChecked = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(mPrefKeyChecked, mDefaultValueChecked);
+
         View checkboxView = view.findViewById(android.R.id.checkbox);
         if (checkboxView != null && checkboxView instanceof Checkable) {
+        	mCheckBox = (Checkable) checkboxView;
+        	CheckBox checkbox = (CheckBox) checkboxView;
+
+        	// Remove old listener to prevent issues with view recycling
+        	checkbox.setOnCheckedChangeListener(null);
+
         	checkboxView.setClickable(true);
-            ((Checkable) checkboxView).setChecked(mChecked);
-            ((CheckBox) checkboxView).setOnCheckedChangeListener(this);
+            mCheckBox.setChecked(mChecked);
+
+            // Set listener after setting the checked state to avoid triggering onChange
+            checkbox.setOnCheckedChangeListener(this);
         }
 
         view.setOnClickListener(this);
         view.setLongClickable(true);
-        
+
 		return view;
 	}
 
@@ -60,6 +71,7 @@ public class CheckBoxPreferenceExt extends Preference implements CompoundButton.
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		mChecked = isChecked;
 		Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
 		editor.putBoolean(mPrefKeyChecked, isChecked);
 		editor.commit();
