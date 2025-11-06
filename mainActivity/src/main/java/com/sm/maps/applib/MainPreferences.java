@@ -242,7 +242,11 @@ public class MainPreferences extends PreferenceActivity implements OnSharedPrefe
 			findPreference("pref_dir_export").setSummary(aPref.getString("pref_dir_export", Ut.getExternalStorageDirectory(getApplicationContext())+"/rmaps/export/"));
 		}
 		else if(aKey.equalsIgnoreCase("pref_locale")) {
-			Locale locale = ((MapApplication) getApplication()).getDefLocale();
+			// TODO: Phase 1 - MapApplication is now in rMapsFree module
+			// This will be refactored in Phase 4 when MainActivity is migrated to MVVM
+			// For now, use default locale
+			Locale locale = Locale.getDefault();
+			// Locale locale = ((MapApplication) getApplication()).getDefLocale();
 			final String lang = aPref.getString("pref_locale", " ");
 			if(lang.equalsIgnoreCase("zh_CN")) {
 				locale = Locale.SIMPLIFIED_CHINESE;
