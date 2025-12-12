@@ -4,22 +4,32 @@ import com.sm.maps.applib.data.local.database.dao.PoiDao
 import com.sm.maps.applib.data.local.database.dao.CategoryDao
 import com.sm.maps.applib.data.mapper.toDomain
 import com.sm.maps.applib.data.mapper.toEntity
+import com.sm.maps.applib.di.IoDispatcher
+import com.sm.maps.applib.domain.repository.IPoiRepository
 import com.sm.maps.applib.kml.PoiPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PoiRepository(
+/**
+ * Implementation of POI repository
+ * Handles data operations for Points of Interest using Room database
+ */
+@Singleton
+class PoiRepository @Inject constructor(
     private val poiDao: PoiDao,
-    private val categoryDao: CategoryDao
-) {
-    fun getAllPois(): Flow<List<PoiPoint>> =
+    private val categoryDao: CategoryDao,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+) : IPoiRepository {
+    override fun getAllPois(): Flow<List<PoiPoint>> =
         poiDao.getAllPois().map { entities ->
             entities.map { it.toDomain() }
         }
 
-    fun getPoisInBounds(
+    override fun getPoisInBounds(
         minLon: Double,
         maxLon: Double,
         minLat: Double,
@@ -28,31 +38,31 @@ class PoiRepository(
         poiDao.getPoisInBounds(minLon, maxLon, minLat, maxLat)
             .map { entities -> entities.map { it.toDomain() } }
 
-    suspend fun getPoiById(id: Int): PoiPoint? = withContext(Dispatchers.IO) {
+    override suspend fun getPoiById(id: Int): PoiPoint? = withContext(ioDispatcher) {
         poiDao.getPoiById(id)?.toDomain()
     }
 
-    suspend fun insertPoi(poi: PoiPoint): Long = withContext(Dispatchers.IO) {
+    override suspend fun insertPoi(poi: PoiPoint): Long = withContext(ioDispatcher) {
         poiDao.insert(poi.toEntity())
     }
 
-    suspend fun updatePoi(poi: PoiPoint) = withContext(Dispatchers.IO) {
+    override suspend fun updatePoi(poi: PoiPoint) = withContext(ioDispatcher) {
         poiDao.update(poi.toEntity())
     }
 
-    suspend fun deletePoi(poi: PoiPoint) = withContext(Dispatchers.IO) {
+    override suspend fun deletePoi(poi: PoiPoint) = withContext(ioDispatcher) {
         poiDao.delete(poi.toEntity())
     }
 
-    suspend fun deletePoiById(id: Int) = withContext(Dispatchers.IO) {
+    override suspend fun deletePoiById(id: Int) = withContext(ioDispatcher) {
         poiDao.deleteById(id)
     }
 
-    suspend fun deleteAllPois() = withContext(Dispatchers.IO) {
+    override suspend fun deleteAllPois() = withContext(ioDispatcher) {
         poiDao.deleteAll()
     }
 
-    suspend fun insertAll(pois: List<PoiPoint>) = withContext(Dispatchers.IO) {
+    suspend fun insertAll(pois: List<PoiPoint>) = withContext(ioDispatcher) {
         poiDao.insertAll(pois.map { it.toEntity() })
     }
 }

@@ -29,11 +29,11 @@ android {
         }
     }
 
-//    sourceSets {
-//        main {
-//            aidl.srcDirs = ['src/main/aidl']
-//        }
-//    }
+    sourceSets {
+        main {
+            kotlin.srcDirs += 'src/main/kotlin'
+        }
+    }
 }
 
 dependencies {
