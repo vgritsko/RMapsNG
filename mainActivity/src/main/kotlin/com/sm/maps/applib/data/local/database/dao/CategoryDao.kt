@@ -26,4 +26,8 @@ interface CategoryDao {
 
     @Query("UPDATE category SET hidden = 1 - hidden WHERE categoryid = :id")
     suspend fun toggleVisibility(id: Int)
+
+    // Synchronous methods for data migration
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCategorySync(category: CategoryEntity): Long
 }

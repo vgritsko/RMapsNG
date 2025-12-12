@@ -45,4 +45,8 @@ interface PoiDao {
     suspend fun insertAll(pois: List<PoiEntity>) {
         pois.forEach { insert(it) }
     }
+
+    // Synchronous methods for data migration
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertPoiSync(poi: PoiEntity): Long
 }

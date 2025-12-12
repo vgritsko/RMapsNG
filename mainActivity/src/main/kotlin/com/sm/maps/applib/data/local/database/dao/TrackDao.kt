@@ -53,4 +53,11 @@ interface TrackDao {
         insertTrackPoints(pointsWithTrackId)
         return trackId
     }
+
+    // Synchronous methods for data migration
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTrackSync(track: TrackEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTrackPointSync(point: TrackPointEntity): Long
 }
