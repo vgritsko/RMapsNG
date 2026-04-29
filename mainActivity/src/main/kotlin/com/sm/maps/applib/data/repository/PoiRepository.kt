@@ -1,12 +1,12 @@
 package com.sm.maps.applib.data.repository
 
-import com.sm.maps.applib.data.local.database.dao.PoiDao
 import com.sm.maps.applib.data.local.database.dao.CategoryDao
+import com.sm.maps.applib.data.local.database.dao.PoiDao
 import com.sm.maps.applib.data.mapper.toDomain
 import com.sm.maps.applib.data.mapper.toEntity
 import com.sm.maps.applib.di.IoDispatcher
+import com.sm.maps.applib.domain.model.PoiPoint
 import com.sm.maps.applib.domain.repository.IPoiRepository
-import com.sm.maps.applib.kml.PoiPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -14,20 +14,15 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Implementation of POI repository
- * Handles data operations for Points of Interest using Room database
- */
 @Singleton
 class PoiRepository @Inject constructor(
     private val poiDao: PoiDao,
     private val categoryDao: CategoryDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : IPoiRepository {
+
     override fun getAllPois(): Flow<List<PoiPoint>> =
-        poiDao.getAllPois().map { entities ->
-            entities.map { it.toDomain() }
-        }
+        poiDao.getAllPois().map { entities -> entities.map { it.toDomain() } }
 
     override fun getPoisInBounds(
         minLon: Double,

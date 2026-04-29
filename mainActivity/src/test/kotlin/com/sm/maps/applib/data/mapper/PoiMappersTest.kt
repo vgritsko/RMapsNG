@@ -1,8 +1,7 @@
 package com.sm.maps.applib.data.mapper
 
 import com.sm.maps.applib.data.local.database.entity.PoiEntity
-import com.sm.maps.applib.kml.PoiPoint
-import org.andnav.osm.util.GeoPoint
+import com.sm.maps.applib.domain.model.PoiPoint
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -10,7 +9,7 @@ class PoiMappersTest {
 
     @Test
     fun poiEntityToDomainConvertsCorrectly() {
-        val poiEntity = PoiEntity(
+        val entity = PoiEntity(
             id = 1,
             name = "Coffee Shop",
             description = "Best coffee in town",
@@ -23,47 +22,65 @@ class PoiMappersTest {
             iconId = 123
         )
 
-        val poi = poiEntity.toDomain()
+        val poi = entity.toDomain()
 
-        assertEquals("Coffee Shop", poi.Title)
-        assertEquals("Best coffee in town", poi.Descr)
-        assertNotNull(poi.GeoPoint)
-        assertEquals(45.5231, poi.GeoPoint?.latitude ?: 0.0, 0.0001)
-        assertEquals(-122.6765, poi.GeoPoint?.longitude ?: 0.0, 0.0001)
-        assertEquals(100.5, poi.Alt, 0.001)
-        assertFalse(poi.Hidden)
-        assertEquals(5, poi.CategoryId)
-        assertEquals(1, poi.PointSourceId)
-        assertEquals(123, poi.IconId)
+        assertEquals(1, poi.id)
+        assertEquals("Coffee Shop", poi.name)
+        assertEquals("Best coffee in town", poi.description)
+        assertEquals(45.5231, poi.latitude, 0.0001)
+        assertEquals(-122.6765, poi.longitude, 0.0001)
+        assertEquals(100.5, poi.altitude, 0.001)
+        assertFalse(poi.hidden)
+        assertEquals(5, poi.categoryId)
+        assertEquals(1, poi.pointSourceId)
+        assertEquals(123, poi.iconId)
+    }
+
+    @Test
+    fun poiEntityToDomainHiddenConvertsCorrectly() {
+        val entity = PoiEntity(id = 2, hidden = 1)
+        assertTrue(entity.toDomain().hidden)
+    }
+
+    @Test
+    fun poiEntityToDomainNullIconId() {
+        val entity = PoiEntity(id = 3, iconId = null)
+        assertNull(entity.toDomain().iconId)
     }
 
     @Test
     fun poiPointToEntityConvertsCorrectly() {
         val poi = PoiPoint(
-            10,
-            "Restaurant",
-            "Italian cuisine",
-            GeoPoint(45523100, -122676500),
-            456,
-            3,
-            50.0,
-            2,
-            1
+            id = 10,
+            name = "Restaurant",
+            description = "Italian cuisine",
+            latitude = 45.5231,
+            longitude = -122.6765,
+            altitude = 50.0,
+            hidden = true,
+            categoryId = 3,
+            pointSourceId = 2,
+            iconId = 456
         )
 
-        val poiEntity = poi.toEntity()
+        val entity = poi.toEntity()
 
-        assertEquals(10, poiEntity.id)
-        assertEquals("Restaurant", poiEntity.name)
-        assertEquals("Italian cuisine", poiEntity.description)
-        // GeoPoint.latitude returns degrees (already /1E6), then mapper divides by 1E6 again
-        assertEquals(0.0000455231, poiEntity.latitude, 0.0000000001)
-        assertEquals(-0.0001226765, poiEntity.longitude, 0.0000000001)
-        assertEquals(50.0, poiEntity.altitude, 0.001)
-        assertEquals(1, poiEntity.hidden)
-        assertEquals(3, poiEntity.categoryId)
-        assertEquals(2, poiEntity.pointSourceId)
-        assertEquals(456, poiEntity.iconId)
+        assertEquals(10, entity.id)
+        assertEquals("Restaurant", entity.name)
+        assertEquals("Italian cuisine", entity.description)
+        assertEquals(45.5231, entity.latitude, 0.0001)
+        assertEquals(-122.6765, entity.longitude, 0.0001)
+        assertEquals(50.0, entity.altitude, 0.001)
+        assertEquals(1, entity.hidden)
+        assertEquals(3, entity.categoryId)
+        assertEquals(2, entity.pointSourceId)
+        assertEquals(456, entity.iconId)
+    }
+
+    @Test
+    fun poiPointToEntityHiddenFalseConvertsToZero() {
+        val poi = PoiPoint(id = 1, hidden = false)
+        assertEquals(0, poi.toEntity().hidden)
     }
 
     @Test
@@ -77,17 +94,17 @@ class PoiMappersTest {
         val pois = entities.toDomain()
 
         assertEquals(3, pois.size)
-        assertEquals("POI 1", pois[0].Title)
-        assertEquals("POI 2", pois[1].Title)
-        assertEquals("POI 3", pois[2].Title)
+        assertEquals("POI 1", pois[0].name)
+        assertEquals("POI 2", pois[1].name)
+        assertEquals("POI 3", pois[2].name)
     }
 
     @Test
     fun listOfPoiPointsToEntityConvertsAll() {
         val pois = listOf(
-            PoiPoint().apply { Title = "A" },
-            PoiPoint().apply { Title = "B" },
-            PoiPoint().apply { Title = "C" }
+            PoiPoint(id = 1, name = "A"),
+            PoiPoint(id = 2, name = "B"),
+            PoiPoint(id = 3, name = "C")
         )
 
         val entities = pois.toEntity()
