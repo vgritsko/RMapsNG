@@ -26,6 +26,8 @@ class MapEventBridge(
         fun onMeasureShowInfoBubble(show: Boolean)
         fun onMeasureShowLineInfo(show: Boolean)
         fun onMapSourceChanged(mapId: String, overlayId: String, showOverlay: Boolean)
+        fun onOverlayRefreshRequested()
+        fun onCompassToggled(enabled: Boolean)
     }
 
     fun observe(listener: Listener) {
@@ -45,6 +47,8 @@ class MapEventBridge(
                         is MapEvent.MeasureShowInfoBubble -> listener.onMeasureShowInfoBubble(event.show)
                         is MapEvent.MeasureShowLineInfo -> listener.onMeasureShowLineInfo(event.show)
                         is MapEvent.MapSourceChanged -> listener.onMapSourceChanged(event.mapId, event.overlayId, event.showOverlay)
+                        is MapEvent.OverlayRefreshRequested -> listener.onOverlayRefreshRequested()
+                        is MapEvent.CompassToggled -> listener.onCompassToggled(event.enabled)
                     }
                 }
             }

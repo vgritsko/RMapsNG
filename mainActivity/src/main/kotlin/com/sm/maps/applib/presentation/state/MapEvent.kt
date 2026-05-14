@@ -15,4 +15,6 @@ sealed class MapEvent {
     data class MeasureShowInfoBubble(val show: Boolean) : MapEvent()
     data class MeasureShowLineInfo(val show: Boolean) : MapEvent()
     data class MapSourceChanged(val mapId: String, val overlayId: String, val showOverlay: Boolean) : MapEvent()
+    data object OverlayRefreshRequested : MapEvent()
+    data class CompassToggled(val enabled: Boolean) : MapEvent()
 }

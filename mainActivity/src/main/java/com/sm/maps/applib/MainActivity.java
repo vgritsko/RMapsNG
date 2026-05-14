@@ -97,6 +97,7 @@ import com.sm.maps.applib.R;
 import com.sm.maps.applib.presentation.ui.map.LocationTrackingFragment;
 import com.sm.maps.applib.presentation.ui.map.MapEventBridge;
 import com.sm.maps.applib.presentation.ui.map.MapSourceSelectionFragment;
+import com.sm.maps.applib.presentation.ui.map.OverlayControlFragment;
 import com.sm.maps.applib.presentation.ui.map.MeasureToolFragment;
 import com.sm.maps.applib.presentation.viewmodel.MapCoordinatorViewModel;
 
@@ -338,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
 		setupLocationFragment();
 		setupMeasureFragment();
 		setupMapSourceFragment();
+		setupOverlayControlFragment();
 	}
 
 	private void setupLocationFragment() {
@@ -444,6 +446,26 @@ public class MainActivity extends AppCompatActivity {
 				FillOverlays();
 				setTitle();
 			}
+
+			@Override
+			public void onOverlayRefreshRequested() {
+				FillOverlays();
+				mMap.invalidate();
+			}
+
+			@Override
+			public void onCompassToggled(boolean enabled) {
+				mCompassEnabled = enabled;
+				mCompassView.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+				if (enabled) {
+					mOrientationSensorManager.registerListener(mListener,
+						mOrientationSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+						SensorManager.SENSOR_DELAY_UI);
+				} else {
+					mOrientationSensorManager.unregisterListener(mListener);
+					mMap.setBearing(0);
+				}
+			}
 		});
 	}
 
@@ -459,6 +481,14 @@ public class MainActivity extends AppCompatActivity {
 		if (getSupportFragmentManager().findFragmentByTag("map_source_fragment") == null) {
 			getSupportFragmentManager().beginTransaction()
 				.add(new MapSourceSelectionFragment(), "map_source_fragment")
+				.commit();
+		}
+	}
+
+	private void setupOverlayControlFragment() {
+		if (getSupportFragmentManager().findFragmentByTag("overlay_control_fragment") == null) {
+			getSupportFragmentManager().beginTransaction()
+				.add(new OverlayControlFragment(), "overlay_control_fragment")
 				.commit();
 		}
 	}
