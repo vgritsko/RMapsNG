@@ -1279,7 +1279,7 @@ public class MainActivity extends AppCompatActivity {
 			onSearchRequested();
 			return true;
 		} else if (item.getItemId() == R.id.settings) {
-			startActivityForResult(new Intent(this, MainPreferences.class), R.id.settings_activity_closed & 0xFFFF);
+			startActivityForResult(new Intent(this, com.sm.maps.applib.presentation.ui.settings.SettingsActivity.class), R.id.settings_activity_closed & 0xFFFF);
 			return true;
 		} else if (item.getItemId() == R.id.about) {
 			showDialog(R.id.about);

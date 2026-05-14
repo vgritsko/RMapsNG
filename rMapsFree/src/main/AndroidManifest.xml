@@ -76,6 +76,9 @@
         <activity android:name="com.sm.maps.applib.MainPreferences" >
         </activity>
 
+        <activity android:name="com.sm.maps.applib.presentation.ui.settings.SettingsActivity"
+            android:label="@string/menu_settings" />
+
         <provider
             android:name="com.sm.maps.applib.utils.SearchSuggestionsProvider"
             android:authorities="com.sm.maps.SuggestionProvider">
