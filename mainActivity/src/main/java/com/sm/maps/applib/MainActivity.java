@@ -90,9 +90,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.sm.maps.applib.R;
+import com.sm.maps.applib.presentation.ui.map.LocationTrackingFragment;
+import com.sm.maps.applib.presentation.ui.map.MapEventBridge;
+import com.sm.maps.applib.presentation.viewmodel.MapCoordinatorViewModel;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import com.sm.maps.applib.dashboard.IndicatorManager;
 import com.sm.maps.applib.dashboard.IndicatorView;
 import com.sm.maps.applib.dashboard.IndicatorView.IndicatorViewMenuInfo;
@@ -130,6 +136,7 @@ import com.sm.maps.applib.view.MapView;
 import com.sm.maps.applib.view.TileView;
 import com.sm.maps.applib.view.TileViewOverlay;
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 	private static final String MAPNAME = "MapName";
 	private static final String ACTION_SHOW_POINTS = "com.sm.maps.action.SHOW_POINTS";
@@ -176,6 +183,8 @@ public class MainActivity extends AppCompatActivity {
 	private ImageView mOverlayView;
 	private ImageView mMainMenu = null;
 	private ExecutorService mThreadPool = Executors.newSingleThreadExecutor(new SimpleThreadFactory("MainActivity.Search"));
+
+	private MapCoordinatorViewModel mCoordinatorViewModel;
 
 	private static final int PERMISSIONS_REQUEST_CODE = 1;
 
@@ -323,6 +332,56 @@ public class MainActivity extends AppCompatActivity {
 			}
 			queryIntent.setAction("");
 		}
+
+		setupLocationFragment();
+	}
+
+	private void setupLocationFragment() {
+		mCoordinatorViewModel = new ViewModelProvider(this).get(MapCoordinatorViewModel.class);
+
+		if (getSupportFragmentManager().findFragmentByTag("location_tracking") == null) {
+			getSupportFragmentManager().beginTransaction()
+				.add(new LocationTrackingFragment(), "location_tracking")
+				.commit();
+		}
+
+		new MapEventBridge(this, mCoordinatorViewModel).observe(new MapEventBridge.Listener() {
+			@Override
+			public void onLocationUpdated(android.location.Location location) {
+				mMyLocationOverlay.setLocation(location);
+				mSearchResultOverlay.setLocation(location);
+				if (mIndicatorManager != null) mIndicatorManager.setLocation(location);
+				if (mAutoFollow) {
+					if (mDrivingDirectionUp && location.getSpeed() > 0.5f)
+						mMap.setBearing(location.getBearing());
+					mMap.getController().setCenter(TypeConverter.locationToGeoPoint(location));
+				} else {
+					mMap.invalidate();
+				}
+				setTitle();
+			}
+
+			@Override
+			public void onBearingChanged(float bearing) {
+				if (mCompassEnabled) {
+					mMap.setBearing(bearing);
+					mMap.invalidate();
+				}
+			}
+
+			@Override
+			public void onAutoFollowChanged(boolean enabled) {
+				mAutoFollow = enabled;
+				if (ivAutoFollow != null)
+					ivAutoFollow.setVisibility(enabled ? ImageView.INVISIBLE : ImageView.VISIBLE);
+			}
+
+			@Override
+			public void onCenterOnLocationRequested(android.location.Location location) {
+				if (location != null)
+					mMap.getController().setCenter(TypeConverter.locationToGeoPoint(location));
+			}
+		});
 	}
 
 	private void requestPermissionsIfNeeded() {
