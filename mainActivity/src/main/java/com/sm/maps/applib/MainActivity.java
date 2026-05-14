@@ -96,6 +96,7 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.presentation.ui.map.LocationTrackingFragment;
 import com.sm.maps.applib.presentation.ui.map.MapEventBridge;
+import com.sm.maps.applib.presentation.ui.map.MeasureToolFragment;
 import com.sm.maps.applib.presentation.viewmodel.MapCoordinatorViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -334,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		setupLocationFragment();
+		setupMeasureFragment();
 	}
 
 	private void setupLocationFragment() {
@@ -381,7 +383,67 @@ public class MainActivity extends AppCompatActivity {
 				if (location != null)
 					mMap.getController().setCenter(TypeConverter.locationToGeoPoint(location));
 			}
+
+			@Override
+			public void onMeasureToolOpen() {
+				doMeasureStart();
+			}
+
+			@Override
+			public void onMeasureToolClose() {
+				mMeasureOverlay = null;
+				((android.view.ViewGroup) findViewById(R.id.bottom_area)).removeAllViews();
+				FillOverlays();
+			}
+
+			@Override
+			public void onMeasureAddPointOnCenter() {
+				if (mMeasureOverlay != null) {
+					mMeasureOverlay.addPointOnCenter(mMap.getTileView());
+					mMap.invalidate();
+				}
+			}
+
+			@Override
+			public void onMeasureClear() {
+				if (mMeasureOverlay != null) {
+					mMeasureOverlay.Clear();
+					mMap.invalidate();
+				}
+			}
+
+			@Override
+			public void onMeasureUndo() {
+				if (mMeasureOverlay != null) {
+					mMeasureOverlay.Undo();
+					mMap.invalidate();
+				}
+			}
+
+			@Override
+			public void onMeasureShowInfoBubble(boolean show) {
+				if (mMeasureOverlay != null) {
+					mMeasureOverlay.setShowInfoBubble(show);
+					mMap.invalidate();
+				}
+			}
+
+			@Override
+			public void onMeasureShowLineInfo(boolean show) {
+				if (mMeasureOverlay != null) {
+					mMeasureOverlay.setShowLineInfo(show);
+					mMap.invalidate();
+				}
+			}
 		});
+	}
+
+	private void setupMeasureFragment() {
+		if (getSupportFragmentManager().findFragmentByTag("measure_tool_fragment") == null) {
+			getSupportFragmentManager().beginTransaction()
+				.add(new MeasureToolFragment(), "measure_tool_fragment")
+				.commit();
+		}
 	}
 
 	private void requestPermissionsIfNeeded() {

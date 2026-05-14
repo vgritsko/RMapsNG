@@ -18,6 +18,13 @@ class MapEventBridge(
         fun onBearingChanged(bearing: Float)
         fun onAutoFollowChanged(enabled: Boolean)
         fun onCenterOnLocationRequested(location: Location?)
+        fun onMeasureToolOpen()
+        fun onMeasureToolClose()
+        fun onMeasureAddPointOnCenter()
+        fun onMeasureClear()
+        fun onMeasureUndo()
+        fun onMeasureShowInfoBubble(show: Boolean)
+        fun onMeasureShowLineInfo(show: Boolean)
     }
 
     fun observe(listener: Listener) {
@@ -29,6 +36,13 @@ class MapEventBridge(
                         is MapEvent.BearingChanged -> listener.onBearingChanged(event.bearing)
                         is MapEvent.AutoFollowChanged -> listener.onAutoFollowChanged(event.enabled)
                         is MapEvent.CenterOnLocationRequested -> listener.onCenterOnLocationRequested(event.location)
+                        is MapEvent.MeasureToolOpen -> listener.onMeasureToolOpen()
+                        is MapEvent.MeasureToolClose -> listener.onMeasureToolClose()
+                        is MapEvent.MeasureAddPointOnCenter -> listener.onMeasureAddPointOnCenter()
+                        is MapEvent.MeasureClear -> listener.onMeasureClear()
+                        is MapEvent.MeasureUndo -> listener.onMeasureUndo()
+                        is MapEvent.MeasureShowInfoBubble -> listener.onMeasureShowInfoBubble(event.show)
+                        is MapEvent.MeasureShowLineInfo -> listener.onMeasureShowLineInfo(event.show)
                     }
                 }
             }
