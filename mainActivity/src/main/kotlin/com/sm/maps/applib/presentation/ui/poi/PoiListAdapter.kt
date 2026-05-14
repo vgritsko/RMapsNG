@@ -9,7 +9,8 @@ import com.sm.maps.applib.databinding.ItemPoiBinding
 import com.sm.maps.applib.domain.model.PoiPoint
 
 class PoiListAdapter(
-    private val onVisibilityToggle: (PoiPoint) -> Unit
+    private val onVisibilityToggle: (PoiPoint) -> Unit,
+    private val onItemClick: (PoiPoint) -> Unit = {}
 ) : ListAdapter<PoiPoint, PoiListAdapter.ViewHolder>(DiffCallback()) {
 
     public override fun getItem(position: Int): PoiPoint = super.getItem(position)
@@ -26,6 +27,8 @@ class PoiListAdapter(
             binding.cbVisible.setOnCheckedChangeListener { _, _ ->
                 onVisibilityToggle(poi)
             }
+
+            binding.root.setOnClickListener { onItemClick(poi) }
         }
     }
 

@@ -105,6 +105,8 @@ import com.sm.maps.applib.kml.PoiManager;
 import com.sm.maps.applib.kml.PoiPoint;
 import com.sm.maps.applib.kml.Track;
 import com.sm.maps.applib.kml.TrackListActivity;
+import com.sm.maps.applib.presentation.ui.poi.PoiListHostActivity;
+import com.sm.maps.applib.presentation.ui.track.TrackListHostActivity;
 import com.sm.maps.applib.kml.XMLparser.PredefMapsParser;
 import com.sm.maps.applib.overlays.CurrentTrackOverlay;
 import com.sm.maps.applib.overlays.MeasureOverlay;
@@ -1101,10 +1103,10 @@ public class MainActivity extends AppCompatActivity {
 					.putExtra("title", "POI"), R.id.menu_addpoi & 0xFFFF);
 			return true;
 		} else if (item.getItemId() == R.id.poilist) {
-			startActivityForResult((new Intent(this, PoiListActivity.class)).putExtra("lat", point.getLatitude()).putExtra("lon", point.getLongitude()).putExtra("title", "POI"), R.id.poilist & 0xFFFF);
+			startActivityForResult((new Intent(this, PoiListHostActivity.class)).putExtra("lat", point.getLatitude()).putExtra("lon", point.getLongitude()).putExtra("title", "POI"), R.id.poilist & 0xFFFF);
 			return true;
 		} else if (item.getItemId() == R.id.tracks) {
-			startActivityForResult(new Intent(this, TrackListActivity.class), R.id.tracks & 0xFFFF);
+			startActivityForResult(new Intent(this, TrackListHostActivity.class), R.id.tracks & 0xFFFF);
 			return true;
 //		} else if (item.getItemId() == R.id.routes) {
 			//startActivityForResult(new Intent(this, RouteListActivity.class), R.id.routes);

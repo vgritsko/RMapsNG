@@ -1,5 +1,6 @@
 package com.sm.maps.applib.presentation.ui.track
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,12 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class TrackListFragment : BaseFragment(R.layout.fragment_track_list) {
 
+    interface OnTrackSelectedListener {
+        fun onTrackSelected(trackId: Int)
+    }
+
+    private var listener: OnTrackSelectedListener? = null
+
     private var _binding: FragmentTrackListBinding? = null
     private val binding get() = _binding!!
 
@@ -31,6 +38,16 @@ class TrackListFragment : BaseFragment(R.layout.fragment_track_list) {
     private lateinit var adapter: TrackListAdapter
 
     override fun getViewModel(): BaseViewModel = viewModel
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? OnTrackSelectedListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -45,7 +62,10 @@ class TrackListFragment : BaseFragment(R.layout.fragment_track_list) {
     }
 
     override fun setupViews() {
-        adapter = TrackListAdapter(onVisibilityToggle = { track -> viewModel.toggleTrackVisibility(track.id) })
+        adapter = TrackListAdapter(
+            onVisibilityToggle = { track -> viewModel.toggleTrackVisibility(track.id) },
+            onItemClick = { track -> listener?.onTrackSelected(track.id) }
+        )
         binding.rvTracks.layoutManager = LinearLayoutManager(requireContext())
         binding.rvTracks.adapter = adapter
 

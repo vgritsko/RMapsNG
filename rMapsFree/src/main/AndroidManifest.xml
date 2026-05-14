@@ -141,6 +141,13 @@
         <activity android:name="com.sm.maps.applib.preference.OffsetActivity"></activity>
         <activity android:name="com.sm.maps.applib.downloader.FileDownloadListActivity"></activity>
         <activity android:name="com.sm.maps.applib.geoui.GeoDataActivity"></activity>
+
+        <activity
+            android:name="com.sm.maps.applib.presentation.ui.poi.PoiListHostActivity"
+            android:theme="@style/AppThemeTitle" />
+        <activity
+            android:name="com.sm.maps.applib.presentation.ui.track.TrackListHostActivity"
+            android:theme="@style/AppThemeTitle" />
 </application>
 
 </manifest>

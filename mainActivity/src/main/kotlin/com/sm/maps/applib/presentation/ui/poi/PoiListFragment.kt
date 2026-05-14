@@ -1,5 +1,6 @@
 package com.sm.maps.applib.presentation.ui.poi
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,12 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PoiListFragment : BaseFragment(R.layout.fragment_poi_list) {
 
+    interface OnPoiSelectedListener {
+        fun onPoiSelected(poiId: Int)
+    }
+
+    private var listener: OnPoiSelectedListener? = null
+
     private var _binding: FragmentPoiListBinding? = null
     private val binding get() = _binding!!
 
@@ -31,6 +38,16 @@ class PoiListFragment : BaseFragment(R.layout.fragment_poi_list) {
     private lateinit var adapter: PoiListAdapter
 
     override fun getViewModel(): BaseViewModel = viewModel
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as? OnPoiSelectedListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -45,7 +62,10 @@ class PoiListFragment : BaseFragment(R.layout.fragment_poi_list) {
     }
 
     override fun setupViews() {
-        adapter = PoiListAdapter(onVisibilityToggle = { poi -> viewModel.togglePoiVisibility(poi) })
+        adapter = PoiListAdapter(
+            onVisibilityToggle = { poi -> viewModel.togglePoiVisibility(poi) },
+            onItemClick = { poi -> listener?.onPoiSelected(poi.id) }
+        )
         binding.rvPois.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPois.adapter = adapter
 

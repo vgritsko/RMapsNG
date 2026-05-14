@@ -12,7 +12,8 @@ import java.util.Date
 import java.util.Locale
 
 class TrackListAdapter(
-    private val onVisibilityToggle: (Track) -> Unit
+    private val onVisibilityToggle: (Track) -> Unit,
+    private val onItemClick: (Track) -> Unit = {}
 ) : ListAdapter<Track, TrackListAdapter.ViewHolder>(DiffCallback()) {
 
     public override fun getItem(position: Int): Track = super.getItem(position)
@@ -33,6 +34,8 @@ class TrackListAdapter(
             binding.cbVisible.setOnCheckedChangeListener { _, _ ->
                 onVisibilityToggle(track)
             }
+
+            binding.root.setOnClickListener { onItemClick(track) }
         }
 
         private fun formatDistance(meters: Int): String =
