@@ -98,6 +98,7 @@ import com.sm.maps.applib.presentation.ui.map.LocationTrackingFragment;
 import com.sm.maps.applib.presentation.ui.map.MapEventBridge;
 import com.sm.maps.applib.presentation.ui.map.MapSourceSelectionFragment;
 import com.sm.maps.applib.presentation.ui.map.OverlayControlFragment;
+import com.sm.maps.applib.presentation.ui.map.MapStateFragment;
 import com.sm.maps.applib.presentation.ui.map.MeasureToolFragment;
 import com.sm.maps.applib.presentation.viewmodel.MapCoordinatorViewModel;
 
@@ -340,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
 		setupMeasureFragment();
 		setupMapSourceFragment();
 		setupOverlayControlFragment();
+		setupMapStateFragment();
 	}
 
 	private void setupLocationFragment() {
@@ -466,6 +468,17 @@ public class MainActivity extends AppCompatActivity {
 					mMap.setBearing(0);
 				}
 			}
+
+			@Override
+			public void onMapViewportChanged(int latE6, int lonE6, int zoom) {
+				// state persisted by MapStateFragment.onStop — no action needed here
+			}
+
+			@Override
+			public void onRotationChanged(float bearing) {
+				mMap.setBearing(bearing);
+				mMap.invalidate();
+			}
 		});
 	}
 
@@ -489,6 +502,14 @@ public class MainActivity extends AppCompatActivity {
 		if (getSupportFragmentManager().findFragmentByTag("overlay_control_fragment") == null) {
 			getSupportFragmentManager().beginTransaction()
 				.add(new OverlayControlFragment(), "overlay_control_fragment")
+				.commit();
+		}
+	}
+
+	private void setupMapStateFragment() {
+		if (getSupportFragmentManager().findFragmentByTag("map_state_fragment") == null) {
+			getSupportFragmentManager().beginTransaction()
+				.add(new MapStateFragment(), "map_state_fragment")
 				.commit();
 		}
 	}
@@ -1980,15 +2001,29 @@ public class MainActivity extends AppCompatActivity {
 
 			if(mAutoFollow)
 				setAutoFollow(false);
-//			mMap.InvalidateScaleBar(); // for debug purposes
 
+			if (mCoordinatorViewModel != null) {
+				final org.andnav.osm.util.GeoPoint center = mMap.getMapCenter();
+				mCoordinatorViewModel.emitEvent(
+					new com.sm.maps.applib.presentation.state.MapEvent.MapViewportChanged(
+						center.getLatitudeE6(), center.getLongitudeE6(), mMap.getZoomLevel()
+					)
+				);
+			}
 		}
 
 		public void onZoomDetected() {
-
 			setTitle();
 			mMap.InvalidateScaleBar();
 
+			if (mCoordinatorViewModel != null) {
+				final org.andnav.osm.util.GeoPoint center = mMap.getMapCenter();
+				mCoordinatorViewModel.emitEvent(
+					new com.sm.maps.applib.presentation.state.MapEvent.MapViewportChanged(
+						center.getLatitudeE6(), center.getLongitudeE6(), mMap.getZoomLevel()
+					)
+				);
+			}
 		}
 
 		@Override

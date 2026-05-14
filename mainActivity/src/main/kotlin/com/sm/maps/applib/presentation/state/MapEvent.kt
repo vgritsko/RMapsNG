@@ -17,4 +17,6 @@ sealed class MapEvent {
     data class MapSourceChanged(val mapId: String, val overlayId: String, val showOverlay: Boolean) : MapEvent()
     data object OverlayRefreshRequested : MapEvent()
     data class CompassToggled(val enabled: Boolean) : MapEvent()
+    data class MapViewportChanged(val latE6: Int, val lonE6: Int, val zoom: Int) : MapEvent()
+    data class RotationChanged(val bearing: Float) : MapEvent()
 }

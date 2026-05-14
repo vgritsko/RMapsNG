@@ -28,6 +28,8 @@ class MapEventBridge(
         fun onMapSourceChanged(mapId: String, overlayId: String, showOverlay: Boolean)
         fun onOverlayRefreshRequested()
         fun onCompassToggled(enabled: Boolean)
+        fun onMapViewportChanged(latE6: Int, lonE6: Int, zoom: Int)
+        fun onRotationChanged(bearing: Float)
     }
 
     fun observe(listener: Listener) {
@@ -49,6 +51,8 @@ class MapEventBridge(
                         is MapEvent.MapSourceChanged -> listener.onMapSourceChanged(event.mapId, event.overlayId, event.showOverlay)
                         is MapEvent.OverlayRefreshRequested -> listener.onOverlayRefreshRequested()
                         is MapEvent.CompassToggled -> listener.onCompassToggled(event.enabled)
+                        is MapEvent.MapViewportChanged -> listener.onMapViewportChanged(event.latE6, event.lonE6, event.zoom)
+                        is MapEvent.RotationChanged -> listener.onRotationChanged(event.bearing)
                     }
                 }
             }
