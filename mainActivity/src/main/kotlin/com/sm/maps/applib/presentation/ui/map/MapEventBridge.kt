@@ -25,6 +25,7 @@ class MapEventBridge(
         fun onMeasureUndo()
         fun onMeasureShowInfoBubble(show: Boolean)
         fun onMeasureShowLineInfo(show: Boolean)
+        fun onMapSourceChanged(mapId: String, overlayId: String, showOverlay: Boolean)
     }
 
     fun observe(listener: Listener) {
@@ -43,6 +44,7 @@ class MapEventBridge(
                         is MapEvent.MeasureUndo -> listener.onMeasureUndo()
                         is MapEvent.MeasureShowInfoBubble -> listener.onMeasureShowInfoBubble(event.show)
                         is MapEvent.MeasureShowLineInfo -> listener.onMeasureShowLineInfo(event.show)
+                        is MapEvent.MapSourceChanged -> listener.onMapSourceChanged(event.mapId, event.overlayId, event.showOverlay)
                     }
                 }
             }

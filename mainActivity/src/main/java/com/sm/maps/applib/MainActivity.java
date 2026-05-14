@@ -96,6 +96,7 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.sm.maps.applib.R;
 import com.sm.maps.applib.presentation.ui.map.LocationTrackingFragment;
 import com.sm.maps.applib.presentation.ui.map.MapEventBridge;
+import com.sm.maps.applib.presentation.ui.map.MapSourceSelectionFragment;
 import com.sm.maps.applib.presentation.ui.map.MeasureToolFragment;
 import com.sm.maps.applib.presentation.viewmodel.MapCoordinatorViewModel;
 
@@ -336,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
 
 		setupLocationFragment();
 		setupMeasureFragment();
+		setupMapSourceFragment();
 	}
 
 	private void setupLocationFragment() {
@@ -435,6 +437,13 @@ public class MainActivity extends AppCompatActivity {
 					mMap.invalidate();
 				}
 			}
+
+			@Override
+			public void onMapSourceChanged(String mapId, String overlayId, boolean showOverlay) {
+				setTileSource(mapId, overlayId, showOverlay);
+				FillOverlays();
+				setTitle();
+			}
 		});
 	}
 
@@ -442,6 +451,14 @@ public class MainActivity extends AppCompatActivity {
 		if (getSupportFragmentManager().findFragmentByTag("measure_tool_fragment") == null) {
 			getSupportFragmentManager().beginTransaction()
 				.add(new MeasureToolFragment(), "measure_tool_fragment")
+				.commit();
+		}
+	}
+
+	private void setupMapSourceFragment() {
+		if (getSupportFragmentManager().findFragmentByTag("map_source_fragment") == null) {
+			getSupportFragmentManager().beginTransaction()
+				.add(new MapSourceSelectionFragment(), "map_source_fragment")
 				.commit();
 		}
 	}

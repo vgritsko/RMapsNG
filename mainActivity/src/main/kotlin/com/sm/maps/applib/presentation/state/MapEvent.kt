@@ -14,4 +14,5 @@ sealed class MapEvent {
     data object MeasureUndo : MapEvent()
     data class MeasureShowInfoBubble(val show: Boolean) : MapEvent()
     data class MeasureShowLineInfo(val show: Boolean) : MapEvent()
+    data class MapSourceChanged(val mapId: String, val overlayId: String, val showOverlay: Boolean) : MapEvent()
 }
