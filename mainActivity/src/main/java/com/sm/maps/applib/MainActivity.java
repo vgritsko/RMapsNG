@@ -201,24 +201,7 @@ public class MainActivity extends AppCompatActivity {
 		if(!OpenStreetMapViewConstants.DEBUGMODE)
         	CrashReportHandler.attach(this);
 
-//        mTracker = GoogleAnalyticsTracker.getInstance();
-//        mTracker.startNewSession("UA-10715419-3", 20, this);
-
 		requestPermissionsIfNeeded();
-
-//		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-//				ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-//				ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//
-//			ActivityCompat.requestPermissions(this,
-//					new String[]{
-//							Manifest.permission.ACCESS_FINE_LOCATION,
-//							Manifest.permission.ACCESS_COARSE_LOCATION,
-//							Manifest.permission.READ_EXTERNAL_STORAGE,
-//							Manifest.permission.WRITE_EXTERNAL_STORAGE
-//					},
-//					PERMISSIONS_REQUEST_CODE);
-//		}
 
 		mHasMenuButton = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(this));
 
@@ -227,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
 		mPoiManager = new PoiManager(this);
 		mLocationListener = new SampleLocationListener();
 		mMap.setMoveListener(mMoveListener);
-		//if(!OpenStreetMapViewConstants.DEBUGMODE)
 		mOrientationSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -279,13 +261,6 @@ public class MainActivity extends AppCompatActivity {
 		if (!uiState.getString("app_version", "").equalsIgnoreCase(Ut.getAppVersion(this))) {
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-//			mTracker.setCustomVar(1, "Build", Ut.getAppVersion(this), 1);
-//			mTracker.setCustomVar(2, "Ver", Ut.getPackVersion(this), 1);
-//			mTracker.setCustomVar(3, "DisplaySize", ""+Math.min(metrics.widthPixels, metrics.heightPixels)+"x"+Math.max(metrics.widthPixels, metrics.heightPixels), 1);
-//			mTracker.setCustomVar(4, "DisplayDensity", ""+(int)(160*metrics.density), 1);
-//			mTracker.setCustomVar(5, "APILevel", Build.VERSION.SDK, 1);
-//			mTracker.trackPageView("/InstallApp");
 
 			showDialog(R.id.whatsnew);
 		}
@@ -674,7 +649,6 @@ public class MainActivity extends AppCompatActivity {
 					}
 					JSONObject res = results.getJSONObject(0);
 
-					//handler.obtainMessage(Ut.SEARCH_OK_MESSAGE, res);
 					final String address = res.getString("addressLines").replace("\"", "").replace("[", "").replace("]", "").replace(",", ", ").replace("  ", " ");
 					setAutoFollow(false, true);
 					final GeoPoint point = new GeoPoint((int)(res.getDouble("lat")* 1E6), (int)(res.getDouble("lng")* 1E6));
@@ -1859,9 +1833,7 @@ public class MainActivity extends AppCompatActivity {
 		public void handleMessage(final Message msg) {
 			final int what = msg.what;
 			if (what == Ut.MAPTILEFSLOADER_SUCCESS_ID) {
-				mMap.invalidate(); //postInvalidate();
-			} else if (what == R.id.user_moved_map) {
-				// setAutoFollow(false);
+				mMap.invalidate();
 			} else if (what == R.id.set_title) {
 				setTitle();
 			} else if (what == R.id.add_yandex_bookmark) {
