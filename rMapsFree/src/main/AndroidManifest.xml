@@ -151,6 +151,8 @@
         <activity
             android:name="com.sm.maps.applib.presentation.ui.track.TrackListHostActivity"
             android:theme="@style/AppThemeTitle" />
+        <activity
+            android:name="com.sm.maps.applib.presentation.ui.downloader.DownloaderHostActivity" />
 </application>
 
 </manifest>

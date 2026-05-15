@@ -1212,7 +1212,7 @@ public class MainActivity extends AppCompatActivity {
 		final GeoPoint point = mMap.getMapCenter();
 
 		if(item.getItemId() == R.id.area_selector) {
-			startActivity(new Intent(this, AreaSelectorActivity.class).putExtra("new", true).putExtra(MAPNAME, mTileSource.ID).putExtra("Latitude", point.getLatitudeE6()).putExtra("Longitude", point.getLongitudeE6()).putExtra("ZoomLevel", mMap.getZoomLevel()));
+			startActivity(new Intent(this, com.sm.maps.applib.presentation.ui.downloader.DownloaderHostActivity.class).putExtra("MAPID", mTileSource.ID).putExtra("Latitude", point.getLatitudeE6()).putExtra("Longitude", point.getLongitudeE6()).putExtra("ZoomLevel", mMap.getZoomLevel()));
 			return true;
 		} else if(item.getItemId() == R.id.menu_show_dashboard) {
 			if(mIndicatorManager == null) {
